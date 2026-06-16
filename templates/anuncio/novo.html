@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Novo Anúncio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm border-secondary">
+                <div class="card-header bg-dark text-white py-3">
+                    <h4 class="card-title mb-0 text-uppercase" style="letter-spacing: 1px;">
+                        <i class="bi bi-megaphone me-2"></i>Publicar Novo Anúncio
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4 bg-light">
+                    <form action="{% url 'criar-anuncio' %}" method="POST" novalidate>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">
+                                    {{ field.label }}
+                                </label>
+                                
+                                {{ field }}
+                                
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+
+                                {% if field.help_text %}
+                                    <div class="form-text text-secondary">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-dark btn-lg shadow">
+                                <i class="bi bi-check-circle me-1"></i> Publicar Anúncio
+                            </button>
+                            <a href="{% url 'listar-anuncios' %}" class="btn btn-outline-secondary">
+                                Cancelar e Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
