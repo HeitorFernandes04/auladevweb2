@@ -1,79 +1,80 @@
-.login-container {
-  max-width: 420px;
-  margin: 0 auto;
-  padding-top: 60px;
+ion-content.login-content {
+  --background: #ffffff;
 }
 
-.header {
+.login-container {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 80px 24px 40px;
+}
+
+.brand {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 56px;
 
   h1 {
-    font-size: 2.8rem;
+    font-size: 1rem;
     font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 10px 0;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #000000;
+    margin: 0 0 8px 0;
   }
 
   p {
-    color: #aaaaaa;
-    font-size: 1.05rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #9ca3af;
+    margin: 0;
   }
 }
 
-ion-item {
-  --background: transparent;
-  margin-bottom: 20px;
+.acesse-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #9ca3af;
+  margin: 0 0 32px 0;
 }
 
-ion-label {
-  color: #e0e0e0;
-  font-weight: 500;
+.campo {
+  margin-bottom: 28px;
+}
+
+.campo-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #9ca3af;
+  margin-bottom: 6px;
 }
 
 ion-input {
-  --background: #2c2c2c;
-  --color: white;
-  --placeholder-color: #777;
-  --padding-start: 16px;
-  --padding-end: 16px;
-  border-radius: 10px;
-  border: 1px solid #444;
-}
-
-.forgot-password {
-  text-align: right;
-  margin: 8px 0 30px 0;
-
-  ion-text {
-    color: #a0a0a0;
-    cursor: pointer;
-    font-size: 0.95rem;
-  }
+  --background: transparent;
+  --color: #000000;
+  --placeholder-color: #d1d5db;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --highlight-color-focused: #000000;
+  border-bottom: 1px solid #e5e5e5;
+  border-radius: 0;
+  font-size: 0.875rem;
 }
 
 .login-button {
-  --background: #6366f1;
-  --color: white;
-  height: 54px;
-  font-size: 1.1rem;
+  --background: #000000;
+  --background-activated: #333333;
+  --color: #ffffff;
+  --border-radius: 0;
+  --box-shadow: none;
+  height: 52px;
+  font-size: 0.65rem;
   font-weight: 600;
-  border-radius: 12px;
-  margin-top: 10px;
-}
-
-.register-link {
-  text-align: center;
-  margin-top: 50px;
-  color: #aaaaaa;
-
-  span {
-    color: #6366f1;
-    cursor: pointer;
-    font-weight: 600;
-  }
-}
-
-ion-content {
-  --background: #1a1a1a;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 48px;
 }

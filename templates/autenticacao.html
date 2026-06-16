@@ -1,81 +1,83 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Seleto Clouting</title>
-    
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <title>Entrar — Seleto Clouting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .input-line {
+            display: block;
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            background: transparent;
+            outline: none;
+            padding: 10px 0;
+            font-size: 0.875rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #000;
+            transition: border-color 0.15s ease;
+        }
+        .input-line:focus { border-bottom: 2px solid #000; }
+    </style>
 </head>
-<body>
+<body class="bg-white min-h-screen flex">
 
-    <main class="vh-100 gradient-custom d-flex align-items-center py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+    <!-- Painel esquerdo: branding -->
+    <div class="hidden lg:flex lg:w-1/2 bg-black flex-col items-center justify-center p-16 gap-6">
+        <h1 class="text-white text-2xl font-bold tracking-[0.3em] uppercase">Seleto Clouting</h1>
+        <p class="text-white/40 text-xs tracking-widest text-center max-w-xs leading-relaxed">
+            Marketplace de roupas de marca usadas.<br>Compre e venda peças premium.
+        </p>
+    </div>
 
-                    <article class="card bg-dark text-white" style="border-radius: 3rem;">
-                        <div class="card-body p-5 text-center">
+    <!-- Painel direito: formulário -->
+    <div class="flex-1 flex items-center justify-center px-8 py-16">
+        <div class="w-full max-w-sm">
 
-                            <header class="mb-4">
-                                <h1 class="fw-bold text-uppercase">Seleto Clouting</h1>
-                                <p class="text-white-50 mb-0">Insira suas credenciais para acessar sua conta</p>
-                            </header>
+            <!-- Brand mobile -->
+            <h1 class="lg:hidden text-center font-bold tracking-[0.2em] uppercase text-lg mb-12">
+                Seleto Clouting
+            </h1>
 
-                            {% if mensagem %}
-                                <div class="alert alert-danger" role="alert">
-                                    {{ mensagem }}
-                                </div>
-                            {% endif %}
+            <p class="text-xs uppercase tracking-widest text-gray-400 mb-10">Acesse sua conta</p>
 
-                            <form action="{% url 'login' %}" method="POST" novalidate>
-                                {% csrf_token %}
-
-                                <div class="mb-4">
-                                    <label for="usuario" class="form-label text-white-50">Usuário</label>
-                                    <input type="text" 
-                                           id="usuario" 
-                                           name="usuario" 
-                                           class="form-control form-control-lg bg-dark text-white border-light"
-                                           placeholder="usuario"
-                                           required>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="senha" class="form-label text-white-50">Senha</label>
-                                    <input type="password" 
-                                           id="senha" 
-                                           name="senha" 
-                                           class="form-control form-control-lg bg-dark text-white border-light"
-                                           placeholder="Digite sua senha"
-                                           required>
-                                </div>
-                                
-
-                                <div class="d-flex justify-content-end mb-4">
-                                    <a href="#!" class="text-white-50 small">Esqueceu a senha?</a>
-                                </div>
-
-                                <button type="submit" class="btn btn-outline-light btn-lg w-100 mb-4">
-                                    Entrar
-                                </button>
-                            </form>
-                            
-                            <footer class="mt-3">
-                                <p class="mb-0 text-white-50">
-                                    Não tem uma conta? 
-                                    <a href="/" class="text-white fw-bold">Criar conta</a>
-                                </p>
-                            </footer>
-
-                        </div>
-                    </article>
-
-                </div>
+            {% if mensagem %}
+            <div class="mb-6 flex items-center gap-2 text-sm text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {{ mensagem }}
             </div>
+            {% endif %}
+
+            <form action="{% url 'login' %}" method="POST" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-8">
+                    <label for="usuario" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Usuário</label>
+                    <input type="text" id="usuario" name="usuario" class="input-line" required autocomplete="username">
+                </div>
+
+                <div class="mb-10">
+                    <label for="senha" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Senha</label>
+                    <input type="password" id="senha" name="senha" class="input-line" required autocomplete="current-password">
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-black text-white text-xs uppercase tracking-widest py-4 hover:opacity-70 transition-opacity">
+                    Entrar
+                </button>
+            </form>
+
         </div>
-    </main>
+    </div>
 
 </body>
 </html>

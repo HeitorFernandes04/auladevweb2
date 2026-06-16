@@ -1,62 +1,65 @@
 {% extends 'base.html' %}
 
-{% block title %}Editar Anúncio - {{ anuncio.titulo }}{% endblock %}
+{% block title %}Editar Anúncio — {{ object.titulo }} — Seleto Clouting{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h4 class="card-title mb-0 text-primary">
-                        <i class="bi bi-pencil-square me-2"></i>Editar Anúncio
-                    </h4>
-                </div>
-                <div class="card-body p-4">
-                    <form method="POST" enctype="multipart/form-data" novalidate>
-                        {% csrf_token %}
+<div class="max-w-lg mx-auto px-6 py-12">
 
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-secondary">
-                                    {{ field.label }}
-                                </label>
+    <!-- Cabeçalho -->
+    <div class="mb-10">
+        <a href="{% url 'listar-anuncios' %}" class="flex items-center gap-1.5 text-xs uppercase tracking-widest text-gray-400 hover:text-black transition-colors mb-6">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Voltar
+        </a>
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Editar Anúncio</h1>
+        {% if object.titulo %}
+        <p class="text-sm text-gray-400 mt-1">{{ object.titulo }}</p>
+        {% endif %}
+    </div>
 
-                                {# Renderiza o campo com erro se houver #}
-                                {{ field }}
-
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-
-                                {% if field.help_text %}
-                                    <div class="form-text">{{ field.help_text }}</div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-circle me-1"></i> Salvar Alterações
-                            </button>
-                            <a href="{% url 'listar-anuncios' %}" class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
+    <!-- Foto da peça vinculada -->
+    {% if object.peca.foto %}
+    <div class="mb-8">
+        <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">Peça anunciada</p>
+        <div class="flex items-center gap-4">
+            <img src="{% url 'foto-peca' arquivo=object.peca.foto.name %}"
+                 alt="{{ object.peca.modelo }}"
+                 class="w-16 h-20 object-cover bg-[#f4f4f4]">
+            <div>
+                <p class="text-xs uppercase tracking-widest text-gray-400">{{ object.peca.get_marca_display }}</p>
+                <p class="text-sm font-semibold">{{ object.peca.modelo }}</p>
             </div>
-
-            {# Miniatura da foto atual da peça anunciada, se existir #}
-            {% if anuncio.peca.foto %}
-            <div class="mt-3 text-center">
-                <p class="text-muted small">Foto atual:</p>
-                <img src="{{ anuncio.peca.foto.url }}" alt="Foto atual" class="img-thumbnail" style="max-height: 150px;">
-            </div>
-            {% endif %}
         </div>
     </div>
+    {% endif %}
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="flex flex-col gap-8">
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex flex-col gap-3 mt-12">
+            <button type="submit"
+                    class="w-full bg-black text-white text-xs uppercase tracking-widest py-4 hover:opacity-70 transition-opacity">
+                Salvar Alterações
+            </button>
+            <a href="{% url 'listar-anuncios' %}"
+               class="w-full border border-black text-xs uppercase tracking-widest py-4 text-center hover:bg-gray-50 transition-colors">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
 </div>
 {% endblock %}

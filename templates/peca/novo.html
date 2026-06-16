@@ -1,41 +1,71 @@
 {% extends 'base.html' %}
 
-{%block title %}Nova Peça{% endblock %}
+{% block title %}Nova Peça — Seleto Clouting{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Cadastrar Nova Peça</h2>
-    <form action="/peca/novo/" method="post" enctype="multipart/form-data">
+<div class="max-w-lg mx-auto px-6 py-12">
+
+    <!-- Cabeçalho -->
+    <div class="mb-10">
+        <a href="{% url 'listar-pecas' %}" class="flex items-center gap-1.5 text-xs uppercase tracking-widest text-gray-400 hover:text-black transition-colors mb-6">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Voltar
+        </a>
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Nova Peça</h1>
+    </div>
+
+    <form action="{% url 'criar-peca' %}" method="POST" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="id_marca" class="form-label">Marca</label>
-            {{ form.marca }}
+
+        <div class="flex flex-col gap-8">
+
+            <div>
+                <label for="id_marca" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Marca</label>
+                {{ form.marca }}
+            </div>
+
+            <div>
+                <label for="id_modelo" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Modelo</label>
+                {{ form.modelo }}
+            </div>
+
+            <div>
+                <label for="id_ano" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Ano</label>
+                {{ form.ano }}
+            </div>
+
+            <div>
+                <label for="id_cor" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Cor</label>
+                {{ form.cor }}
+            </div>
+
+            <div>
+                <label for="id_tamanho" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tamanho</label>
+                {{ form.tamanho }}
+            </div>
+
+            <div>
+                <label for="id_categoria" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Categoria</label>
+                {{ form.categoria }}
+            </div>
+
+            <div>
+                <label for="id_foto" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Foto</label>
+                {{ form.foto }}
+            </div>
+
         </div>
-        <div class="mb-3">
-            <label for="id_modelo" class="form-label">Modelo</label>
-            {{ form.modelo }}
+
+        <div class="flex flex-col gap-3 mt-12">
+            <button type="submit"
+                    class="w-full bg-black text-white text-xs uppercase tracking-widest py-4 hover:opacity-70 transition-opacity">
+                Salvar Peça
+            </button>
+            <a href="{% url 'listar-pecas' %}"
+               class="w-full border border-black text-xs uppercase tracking-widest py-4 text-center hover:bg-gray-50 transition-colors">
+                Cancelar
+            </a>
         </div>
-        <div class="mb-3">
-            <label for="id_ano" class="form-label">Ano</label>
-            {{ form.ano }}
-        </div>
-        <div class="mb-3">
-            <label for="id_cor" class="form-label">Cor</label>
-            {{ form.cor }}
-        </div>
-        <div class="mb-3">
-            <label for="id_tamanho" class="form-label">Tamanho</label>
-            {{ form.tamanho }}
-        </div>
-        <div class="mb-3">
-            <label for="id_categoria" class="form-label">Categoria</label>
-            {{ form.categoria }}
-        </div>
-        <div class="mb-3">
-            <label for="id_foto" class="form-label">Foto</label>
-            {{ form.foto}}
-        </div>
-        <button type="submit" class="btn btn-primary">Salvar</button>
+
     </form>
 </div>
 {% endblock %}

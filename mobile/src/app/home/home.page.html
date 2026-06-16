@@ -1,52 +1,36 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Login</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding" [fullscreen]="true">
+<ion-content [fullscreen]="true" class="login-content">
   <div class="login-container">
 
-    <div class="header">
-      <h1>LOGIN</h1>
-      <p>Insira suas credenciais para acessar sua conta</p>
+    <div class="brand">
+      <h1>SELETO CLOUTING</h1>
+      <p>Marketplace de roupas de marca</p>
     </div>
 
-    <ion-item lines="none">
-      <ion-label position="stacked">Usuário</ion-label>
+    <p class="acesse-label">Acesse sua conta</p>
+
+    <div class="campo">
+      <label for="input-usuario" class="campo-label">Usuário</label>
       <ion-input
+        id="input-usuario"
         type="text"
-        placeholder="Digite seu usuário"
         [(ngModel)]="username"
         (keyup.enter)="login()"
       ></ion-input>
-    </ion-item>
+    </div>
 
-    <ion-item lines="none">
-      <ion-label position="stacked">Senha</ion-label>
+    <div class="campo">
+      <label for="input-senha" class="campo-label">Senha</label>
       <ion-input
+        id="input-senha"
         type="password"
-        placeholder="Digite sua senha"
         [(ngModel)]="password"
         (keyup.enter)="login()"
       ></ion-input>
-    </ion-item>
-
-    <div class="forgot-password">
-      <ion-text (click)="forgotPassword()">Esqueceu a senha?</ion-text>
     </div>
 
-    <!-- Chama login() — método definido no .ts e mapeado para autenticarUsuario() -->
     <ion-button expand="block" class="login-button" (click)="login()">
       Entrar
     </ion-button>
-
-    <div class="register-link">
-      <p>
-        Não tem uma conta?
-        <span (click)="goToRegister()">Criar conta</span>
-      </p>
-    </div>
 
   </div>
 </ion-content>

@@ -1,10 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Minhas Peças</ion-title>
+    <ion-title>SELETO CLOUTING</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="confirmarLogout()" color="primary" fill="clear">
-        <ion-icon slot="start" name="log-out-outline"></ion-icon>
-        Sair
+      <ion-button (click)="confirmarLogout()" fill="clear">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -15,87 +14,87 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  <!-- Saudação -->
   <div class="saudacao">
-    <p>Olá, <strong>{{ nomeUsuario }}</strong>!</p>
+    <p>Olá, <strong>{{ nomeUsuario }}</strong></p>
   </div>
 
-  <ion-item lines="none" class="filtro-categoria">
-    <ion-label position="stacked">Filtrar por categoria</ion-label>
-    <ion-select [(ngModel)]="categoriaFiltro" (ionChange)="filtrarPorCategoria()" placeholder="Todas">
-      <ion-select-option [value]="null">Todas</ion-select-option>
+  <!-- Filtro de categoria -->
+  <div class="filtro-wrapper">
+    <ion-select
+      [(ngModel)]="categoriaFiltro"
+      (ionChange)="filtrarPorCategoria()"
+      placeholder="Todas as categorias"
+      interface="action-sheet"
+      class="filtro-select"
+    >
+      <ion-select-option [value]="null">Todas as categorias</ion-select-option>
       <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">
         {{ opcao.label }}
       </ion-select-option>
     </ion-select>
-  </ion-item>
-
-  <div class="loading-container" *ngIf="carregando">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Carregando peças...</p>
   </div>
 
+  <!-- Carregando -->
+  <div class="loading-container" *ngIf="carregando">
+    <ion-spinner name="lines-small"></ion-spinner>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Estado vazio -->
   <div class="empty-state" *ngIf="!carregando && pecas.length === 0">
     <ion-icon name="shirt-outline"></ion-icon>
     <p>Nenhuma peça cadastrada.</p>
   </div>
 
-  <!-- Lista centralizada em 2/3 da largura da tela -->
-  <div class="pecas-wrapper" *ngIf="!carregando && pecas.length > 0">
-    <div class="pecas-lista">
-      <ion-item-sliding *ngFor="let peca of pecas">
+  <!-- Lista de peças -->
+  <div class="pecas-lista" *ngIf="!carregando && pecas.length > 0">
+    <ion-item-sliding *ngFor="let peca of pecas">
 
-        <!-- Deslizar para a DIREITA: Editar -->
-        <ion-item-options side="start">
-          <ion-item-option color="primary" (click)="editarPeca(peca)">
-            <ion-icon slot="top" name="pencil-outline"></ion-icon>
-            Editar
-          </ion-item-option>
-        </ion-item-options>
+      <!-- Deslizar para a DIREITA: Editar -->
+      <ion-item-options side="start">
+        <ion-item-option (click)="editarPeca(peca)" class="option-editar">
+          <ion-icon slot="top" name="pencil-outline"></ion-icon>
+          Editar
+        </ion-item-option>
+      </ion-item-options>
 
-        <!-- Card da peça -->
-        <ion-item lines="none" class="peca-item">
-          <div class="peca-card">
+      <!-- Card da peça -->
+      <ion-item lines="none" class="peca-item">
+        <div class="peca-card">
 
-            <div class="foto-container">
-              <!-- Foto carregada via base64 autenticado -->
-              <img
-                *ngIf="peca.foto && fotosSrc[peca.id]"
-                [src]="fotosSrc[peca.id]"
-                alt="Foto da peça"
-              />
-              <!-- Spinner enquanto a foto ainda está carregando -->
-              <div class="foto-carregando" *ngIf="peca.foto && !fotosSrc[peca.id]">
-                <ion-spinner name="crescent"></ion-spinner>
-              </div>
-              <!-- Sem foto cadastrada -->
-              <div class="sem-foto" *ngIf="!peca.foto">
-                <ion-icon name="shirt-outline"></ion-icon>
-              </div>
+          <div class="foto-container">
+            <img
+              *ngIf="peca.foto && fotosSrc[peca.id]"
+              [src]="fotosSrc[peca.id]"
+              alt="Foto da peça"
+            />
+            <div class="foto-carregando" *ngIf="peca.foto && !fotosSrc[peca.id]">
+              <ion-spinner name="lines-small"></ion-spinner>
             </div>
-
-            <div class="peca-info">
-              <h2>{{ peca.nome_marca }} {{ peca.modelo }}</h2>
-              <div class="peca-detalhes">
-                <span class="tag">{{ peca.ano }}</span>
-                <span class="tag">{{ peca.nome_cor }}</span>
-                <span class="tag">Tam. {{ peca.nome_tamanho }}</span>
-                <span class="tag">{{ peca.nome_categoria }}</span>
-              </div>
+            <div class="sem-foto" *ngIf="!peca.foto">
+              <ion-icon name="shirt-outline"></ion-icon>
             </div>
-
           </div>
-        </ion-item>
 
-        <!-- Deslizar para a ESQUERDA: Excluir -->
-        <ion-item-options side="end">
-          <ion-item-option color="danger" (click)="confirmarExclusao(peca)">
-            <ion-icon slot="top" name="trash-outline"></ion-icon>
-            Excluir
-          </ion-item-option>
-        </ion-item-options>
+          <div class="peca-info">
+            <p class="peca-marca">{{ peca.nome_marca }}</p>
+            <p class="peca-modelo">{{ peca.modelo }}</p>
+            <p class="peca-detalhes">{{ peca.nome_cor }} · Tam. {{ peca.nome_tamanho }} · {{ peca.nome_categoria }}</p>
+          </div>
 
-      </ion-item-sliding>
-    </div>
+        </div>
+      </ion-item>
+
+      <!-- Deslizar para a ESQUERDA: Excluir -->
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="confirmarExclusao(peca)" class="option-excluir">
+          <ion-icon slot="top" name="trash-outline"></ion-icon>
+          Excluir
+        </ion-item-option>
+      </ion-item-options>
+
+    </ion-item-sliding>
   </div>
 
   <!-- Modal de Edição -->
@@ -105,60 +104,55 @@
         <ion-toolbar>
           <ion-title>Editar Peça</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="fecharModal()">Fechar</ion-button>
+            <ion-button (click)="fecharModal()" fill="clear">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content class="ion-padding">
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Modelo</ion-label>
-          <ion-input [(ngModel)]="pecaEditando.modelo" placeholder="Modelo"></ion-input>
-        </ion-item>
+      <ion-content class="modal-content ion-padding">
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Ano</ion-label>
-          <ion-input type="number" [(ngModel)]="pecaEditando.ano" placeholder="Ano"></ion-input>
-        </ion-item>
+        <div class="modal-campo">
+          <label for="edit-modelo" class="modal-label">Modelo</label>
+          <ion-input id="edit-modelo" [(ngModel)]="pecaEditando.modelo" placeholder="Modelo"></ion-input>
+        </div>
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Marca</ion-label>
-          <ion-select [(ngModel)]="pecaEditando.marca" placeholder="Selecione">
-            <ion-select-option *ngFor="let opcao of opcoesMarca" [value]="opcao.valor">
-              {{ opcao.label }}
-            </ion-select-option>
+        <div class="modal-campo">
+          <label for="edit-ano" class="modal-label">Ano</label>
+          <ion-input id="edit-ano" type="number" [(ngModel)]="pecaEditando.ano" placeholder="Ano"></ion-input>
+        </div>
+
+        <div class="modal-campo">
+          <label for="edit-marca" class="modal-label">Marca</label>
+          <ion-select id="edit-marca" [(ngModel)]="pecaEditando.marca" placeholder="Selecione" interface="action-sheet">
+            <ion-select-option *ngFor="let opcao of opcoesMarca" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Cor</ion-label>
-          <ion-select [(ngModel)]="pecaEditando.cor" placeholder="Selecione">
-            <ion-select-option *ngFor="let opcao of opcoesCor" [value]="opcao.valor">
-              {{ opcao.label }}
-            </ion-select-option>
+        <div class="modal-campo">
+          <label for="edit-cor" class="modal-label">Cor</label>
+          <ion-select id="edit-cor" [(ngModel)]="pecaEditando.cor" placeholder="Selecione" interface="action-sheet">
+            <ion-select-option *ngFor="let opcao of opcoesCor" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Tamanho</ion-label>
-          <ion-select [(ngModel)]="pecaEditando.tamanho" placeholder="Selecione">
-            <ion-select-option *ngFor="let opcao of opcoesTamanho" [value]="opcao.valor">
-              {{ opcao.label }}
-            </ion-select-option>
+        <div class="modal-campo">
+          <label for="edit-tamanho" class="modal-label">Tamanho</label>
+          <ion-select id="edit-tamanho" [(ngModel)]="pecaEditando.tamanho" placeholder="Selecione" interface="action-sheet">
+            <ion-select-option *ngFor="let opcao of opcoesTamanho" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none">
-          <ion-label position="stacked">Categoria</ion-label>
-          <ion-select [(ngModel)]="pecaEditando.categoria" placeholder="Selecione">
-            <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">
-              {{ opcao.label }}
-            </ion-select-option>
+        <div class="modal-campo">
+          <label for="edit-categoria" class="modal-label">Categoria</label>
+          <ion-select id="edit-categoria" [(ngModel)]="pecaEditando.categoria" placeholder="Selecione" interface="action-sheet">
+            <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-button expand="block" class="ion-margin-top" (click)="salvarEdicao()">
-          Salvar
+        <ion-button expand="block" class="salvar-button ion-margin-top" (click)="salvarEdicao()">
+          Salvar Alterações
         </ion-button>
 
       </ion-content>

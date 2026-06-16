@@ -1,72 +1,96 @@
 {% extends 'base.html' %}
 
+{% block title %}Peças — Seleto Clouting{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    {% block search_bar %}
-    <div class="container mt-3">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-10">
-                <form action="{% url 'listar-pecas' %}" method="GET" novalidate>
-                    <div class="input-group mb-3">
-                        <input type="text"
-                               name="pesquisa"
-                               class="form-control rounded-pill shadow-sm"
-                               placeholder="Buscar peças pela marca ou descrição..."
-                               value="{{ request.GET.pesquisa|default:'' }}"
-                               style="padding-left: 20px;">
-                        <select name="categoria" class="form-select rounded-pill ms-2" style="max-width: 200px;" onchange="this.form.submit()">
-                            <option value="">Todas as categorias</option>
-                            {% for valor, label in categorias %}
-                                <option value="{{ valor }}" {% if request.GET.categoria == valor|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                        <button class="btn btn-secondary rounded-pill ms-2 px-4" type="submit">
-                            <i class="bi bi-search"></i> Buscar
-                        </button>
-                        <div class="col-md-3 col-lg-2 mt-md-0 mt-2">
-                            <a href="{% url 'criar-peca' %}" class="btn btn-success rounded-pill ">
-                                <i class="bi bi-plus-lg"></i> Novo
-                            </a>
-                        </div>
-                    </div>
-                </form>
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Cabeçalho -->
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Peças</h1>
+        <a href="{% url 'criar-peca' %}"
+           class="flex items-center gap-2 border border-black text-xs uppercase tracking-widest px-5 py-2.5 hover:bg-black hover:text-white transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nova Peça
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <form action="{% url 'listar-pecas' %}" method="GET" novalidate>
+        <div class="flex flex-col sm:flex-row gap-6 mb-10 items-end">
+            <div class="relative flex-1">
+                <input type="text"
+                       name="pesquisa"
+                       placeholder="Buscar por marca ou modelo..."
+                       value="{{ request.GET.pesquisa|default:'' }}">
+                <button type="submit" class="absolute right-0 bottom-2 text-gray-400 hover:text-black transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="sm:w-52">
+                <select name="categoria" onchange="this.form.submit()">
+                    <option value="">Todas as categorias</option>
+                    {% for valor, label in categorias %}
+                        <option value="{{ valor }}" {% if request.GET.categoria == valor|stringformat:'s' %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
-    </div>
-    {% endblock %}
+    </form>
 
-    <div class="row">
+    <!-- Grid de peças -->
+    {% if pecas %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
         {% for peca in pecas %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if peca.foto %}
-                        <img src="{% url 'foto-peca' arquivo=peca.foto.name %}" class="card-img-top" alt="{{ peca.modelo }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <span class="text-muted small">Sem imagem disponível</span>
-                        </div>
-                    {% endif %}
+        <div class="group">
 
-                    <div class="card-body">
-                        <h5 class="card-title">{{ peca.get_marca_display }} {{ peca.modelo }}</h5>
-                        <p class="card-text text-muted mb-0">
-                            {{ peca.ano }} • {{ peca.get_cor_display }} • Tam. {{ peca.get_tamanho_display }} • {{ peca.get_categoria_display }}
-                        </p>
+            <!-- Foto -->
+            <div class="aspect-[3/4] bg-[#f4f4f4] overflow-hidden mb-3">
+                {% if peca.foto %}
+                    <img src="{% url 'foto-peca' arquivo=peca.foto.name %}"
+                         alt="{{ peca.modelo }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i data-lucide="image" class="w-8 h-8 text-gray-300"></i>
                     </div>
-
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between pb-3">
-                        <a href="{% url 'editar-peca' peca.pk %}" class="btn btn-outline-primary btn-sm px-3">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a href="{% url 'excluir-peca' peca.pk %}" class="btn btn-outline-danger btn-sm px-3">
-                            <i class="bi bi-trash"></i> Excluir
-                        </a>
-                    </div>
-                </div>
+                {% endif %}
             </div>
-        {% empty %}
-            <p class="text-center w-100 mt-5">Nenhuma peça cadastrada.</p>
+
+            <!-- Info -->
+            <p class="text-xs uppercase tracking-widest text-gray-400 mb-0.5">{{ peca.get_marca_display }}</p>
+            <p class="text-sm font-semibold mb-0.5">{{ peca.modelo }}</p>
+            <p class="text-xs text-gray-400">
+                {{ peca.get_cor_display }} · Tam. {{ peca.get_tamanho_display }} · {{ peca.get_categoria_display }}
+            </p>
+
+            <!-- Ações -->
+            <div class="flex gap-5 mt-3">
+                <a href="{% url 'editar-peca' peca.pk %}"
+                   class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
+                    Editar
+                </a>
+                <a href="{% url 'excluir-peca' peca.pk %}"
+                   class="text-xs uppercase tracking-widest underline underline-offset-2 text-red-700 hover:opacity-40 transition-opacity">
+                    Excluir
+                </a>
+            </div>
+        </div>
         {% endfor %}
     </div>
+
+    {% else %}
+    <!-- Estado vazio -->
+    <div class="flex flex-col items-center justify-center py-32 text-center">
+        <i data-lucide="package-open" class="w-10 h-10 text-gray-200 mb-4"></i>
+        <p class="text-xs uppercase tracking-widest text-gray-400 mb-6">Nenhuma peça encontrada</p>
+        <a href="{% url 'criar-peca' %}"
+           class="text-xs uppercase tracking-widest border border-black px-6 py-2.5 hover:bg-black hover:text-white transition-colors">
+            Cadastrar primeira peça
+        </a>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

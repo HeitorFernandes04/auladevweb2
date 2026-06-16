@@ -1,65 +1,85 @@
 {% extends 'base.html' %}
 
+{% block title %}Anúncios — Seleto Clouting{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    {% block search_bar %}
-    <div class="container mt-3">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-10">
-                <form action="{% url 'listar-anuncios' %}" method="GET" novalidate>
-                    <div class="input-group mb-3">
-                        <input type="text"
-                               name="pesquisa"
-                               class="form-control rounded-pill shadow-sm"
-                               placeholder="Buscar anúncio pelo título ou peça..."
-                               value="{{ request.GET.pesquisa|default:'' }}"
-                               style="padding-left: 20px;">
-                        <button class="btn btn-secondary rounded-pill ms-2 px-4" type="submit">
-                            <i class="bi bi-search"></i> Buscar
-                        </button>
-                        <div class="col-md-3 col-lg-2 mt-md-0 mt-2 text-end">
-                            <a href="{% url 'criar-anuncio' %}" class="btn btn-success rounded-pill px-4 shadow-sm w-100">
-                                <i class="bi bi-plus-lg"></i> Novo
-                            </a>
-                        </div>
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Cabeçalho -->
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Anúncios</h1>
+        <a href="{% url 'criar-anuncio' %}"
+           class="flex items-center gap-2 border border-black text-xs uppercase tracking-widest px-5 py-2.5 hover:bg-black hover:text-white transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Novo Anúncio
+        </a>
+    </div>
+
+    <!-- Busca -->
+    <form action="{% url 'listar-anuncios' %}" method="GET" novalidate>
+        <div class="relative mb-10 max-w-md">
+            <input type="text"
+                   name="pesquisa"
+                   placeholder="Buscar por título ou peça..."
+                   value="{{ request.GET.pesquisa|default:'' }}">
+            <button type="submit" class="absolute right-0 bottom-2 text-gray-400 hover:text-black transition-colors">
+                <i data-lucide="search" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </form>
+
+    <!-- Grid de anúncios -->
+    {% if anuncios %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+        {% for anuncio in anuncios %}
+        <div class="group">
+
+            <!-- Foto da peça -->
+            <div class="aspect-[3/4] bg-[#f4f4f4] overflow-hidden mb-3">
+                {% if anuncio.peca.foto %}
+                    <img src="{% url 'foto-peca' arquivo=anuncio.peca.foto.name %}"
+                         alt="{{ anuncio.peca.modelo }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i data-lucide="image" class="w-8 h-8 text-gray-300"></i>
                     </div>
-                </form>
+                {% endif %}
+            </div>
+
+            <!-- Info -->
+            <p class="text-xs uppercase tracking-widest text-gray-400 mb-0.5">{{ anuncio.peca.get_marca_display }}</p>
+            <p class="text-sm font-semibold mb-0.5">{{ anuncio.titulo }}</p>
+            <p class="text-xs text-gray-400 mb-1">
+                {{ anuncio.peca.modelo }} · Tam. {{ anuncio.peca.get_tamanho_display }}
+            </p>
+            <p class="text-sm font-semibold">R$ {{ anuncio.preco }}</p>
+
+            <!-- Ações -->
+            <div class="flex gap-5 mt-3">
+                <a href="{% url 'editar-anuncio' anuncio.pk %}"
+                   class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
+                    Editar
+                </a>
+                <a href="{% url 'excluir-anuncio' anuncio.pk %}"
+                   class="text-xs uppercase tracking-widest underline underline-offset-2 text-red-700 hover:opacity-40 transition-opacity">
+                    Excluir
+                </a>
             </div>
         </div>
-    </div>
-    {% endblock %}
-
-    <div class="row">
-        {% for anuncio in anuncios %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if anuncio.peca.foto %}
-                        <img src="{% url 'foto-peca' arquivo=anuncio.peca.foto.name %}" class="card-img-top" alt="{{ anuncio.peca.modelo }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <span class="text-muted small">Sem imagem disponível</span>
-                        </div>
-                    {% endif %} <div class="card-body">
-                        <h5 class="card-title">{{ anuncio.titulo }}</h5>
-                        <p class="card-text text-muted mb-0">
-                            {{ anuncio.peca.get_marca_display }} {{ anuncio.peca.modelo }} • {{ anuncio.peca.get_cor_display }} • Tam. {{ anuncio.peca.get_tamanho_display }}
-                        </p>
-                        <p class="mt-2 fw-bold text-primary">R$ {{ anuncio.preco }}</p>
-                    </div>
-
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between pb-3">
-                        <a href="{% url 'editar-anuncio' anuncio.pk %}" class="btn btn-outline-primary btn-sm px-3">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a href="{% url 'excluir-anuncio' anuncio.pk %}" class="btn btn-outline-danger btn-sm px-3">
-                            <i class="bi bi-trash"></i> Excluir
-                        </a>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-center w-100 mt-5">Nenhum anúncio encontrado.</p>
         {% endfor %}
     </div>
+
+    {% else %}
+    <!-- Estado vazio -->
+    <div class="flex flex-col items-center justify-center py-32 text-center">
+        <i data-lucide="megaphone" class="w-10 h-10 text-gray-200 mb-4"></i>
+        <p class="text-xs uppercase tracking-widest text-gray-400 mb-6">Nenhum anúncio encontrado</p>
+        <a href="{% url 'criar-anuncio' %}"
+           class="text-xs uppercase tracking-widest border border-black px-6 py-2.5 hover:bg-black hover:text-white transition-colors">
+            Publicar primeiro anúncio
+        </a>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

@@ -1,54 +1,46 @@
 {% extends 'base.html' %}
 
-{% block title %}Criar Novo Anúncio{% endblock %}
+{% block title %}Novo Anúncio — Seleto Clouting{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-            <div class="card shadow-sm border-secondary">
-                <div class="card-header bg-dark text-white py-3">
-                    <h4 class="card-title mb-0 text-uppercase" style="letter-spacing: 1px;">
-                        <i class="bi bi-megaphone me-2"></i>Publicar Novo Anúncio
-                    </h4>
-                </div>
-                
-                <div class="card-body p-4 bg-light">
-                    <form action="{% url 'criar-anuncio' %}" method="POST" novalidate>
-                        {% csrf_token %}
+<div class="max-w-lg mx-auto px-6 py-12">
 
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">
-                                    {{ field.label }}
-                                </label>
-                                
-                                {{ field }}
-                                
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-
-                                {% if field.help_text %}
-                                    <div class="form-text text-secondary">{{ field.help_text }}</div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-dark btn-lg shadow">
-                                <i class="bi bi-check-circle me-1"></i> Publicar Anúncio
-                            </button>
-                            <a href="{% url 'listar-anuncios' %}" class="btn btn-outline-secondary">
-                                Cancelar e Voltar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <!-- Cabeçalho -->
+    <div class="mb-10">
+        <a href="{% url 'listar-anuncios' %}" class="flex items-center gap-1.5 text-xs uppercase tracking-widest text-gray-400 hover:text-black transition-colors mb-6">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Voltar
+        </a>
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Novo Anúncio</h1>
     </div>
+
+    <form action="{% url 'criar-anuncio' %}" method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="flex flex-col gap-8">
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex flex-col gap-3 mt-12">
+            <button type="submit"
+                    class="w-full bg-black text-white text-xs uppercase tracking-widest py-4 hover:opacity-70 transition-opacity">
+                Publicar Anúncio
+            </button>
+            <a href="{% url 'listar-anuncios' %}"
+               class="w-full border border-black text-xs uppercase tracking-widest py-4 text-center hover:bg-gray-50 transition-colors">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
 </div>
 {% endblock %}
