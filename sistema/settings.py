@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'veiculo.apps.VeiculoConfig',
+    'peca.apps.PecaConfig',
     'anuncio.apps.AnuncioConfig',
     'rest_framework',
     'rest_framework.authtoken',

@@ -6,19 +6,25 @@
     <div class="container mt-3">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-10">
-                <form action="{% url 'listar-anuncios' %}" method="GET" novalidate>
+                <form action="{% url 'listar-pecas' %}" method="GET" novalidate>
                     <div class="input-group mb-3">
                         <input type="text"
                                name="pesquisa"
                                class="form-control rounded-pill shadow-sm"
-                               placeholder="Buscar anúncio pelo título ou peça..."
+                               placeholder="Buscar peças pela marca ou descrição..."
                                value="{{ request.GET.pesquisa|default:'' }}"
                                style="padding-left: 20px;">
+                        <select name="categoria" class="form-select rounded-pill ms-2" style="max-width: 200px;" onchange="this.form.submit()">
+                            <option value="">Todas as categorias</option>
+                            {% for valor, label in categorias %}
+                                <option value="{{ valor }}" {% if request.GET.categoria == valor|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
                         <button class="btn btn-secondary rounded-pill ms-2 px-4" type="submit">
                             <i class="bi bi-search"></i> Buscar
                         </button>
-                        <div class="col-md-3 col-lg-2 mt-md-0 mt-2 text-end">
-                            <a href="{% url 'criar-anuncio' %}" class="btn btn-success rounded-pill px-4 shadow-sm w-100">
+                        <div class="col-md-3 col-lg-2 mt-md-0 mt-2">
+                            <a href="{% url 'criar-peca' %}" class="btn btn-success rounded-pill ">
                                 <i class="bi bi-plus-lg"></i> Novo
                             </a>
                         </div>
@@ -30,35 +36,36 @@
     {% endblock %}
 
     <div class="row">
-        {% for anuncio in anuncios %}
+        {% for peca in pecas %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
-                    {% if anuncio.peca.foto %}
-                        <img src="{% url 'foto-peca' arquivo=anuncio.peca.foto.name %}" class="card-img-top" alt="{{ anuncio.peca.modelo }}" style="height: 200px; object-fit: cover;">
+                    {% if peca.foto %}
+                        <img src="{% url 'foto-peca' arquivo=peca.foto.name %}" class="card-img-top" alt="{{ peca.modelo }}" style="height: 200px; object-fit: cover;">
                     {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                             <span class="text-muted small">Sem imagem disponível</span>
                         </div>
-                    {% endif %} <div class="card-body">
-                        <h5 class="card-title">{{ anuncio.titulo }}</h5>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ peca.get_marca_display }} {{ peca.modelo }}</h5>
                         <p class="card-text text-muted mb-0">
-                            {{ anuncio.peca.get_marca_display }} {{ anuncio.peca.modelo }} • {{ anuncio.peca.get_cor_display }} • Tam. {{ anuncio.peca.get_tamanho_display }}
+                            {{ peca.ano }} • {{ peca.get_cor_display }} • Tam. {{ peca.get_tamanho_display }} • {{ peca.get_categoria_display }}
                         </p>
-                        <p class="mt-2 fw-bold text-primary">R$ {{ anuncio.preco }}</p>
                     </div>
 
                     <div class="card-footer bg-white border-top-0 d-flex justify-content-between pb-3">
-                        <a href="{% url 'editar-anuncio' anuncio.pk %}" class="btn btn-outline-primary btn-sm px-3">
+                        <a href="{% url 'editar-peca' peca.pk %}" class="btn btn-outline-primary btn-sm px-3">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
-                        <a href="{% url 'excluir-anuncio' anuncio.pk %}" class="btn btn-outline-danger btn-sm px-3">
+                        <a href="{% url 'excluir-peca' peca.pk %}" class="btn btn-outline-danger btn-sm px-3">
                             <i class="bi bi-trash"></i> Excluir
                         </a>
                     </div>
                 </div>
             </div>
         {% empty %}
-            <p class="text-center w-100 mt-5">Nenhum anúncio encontrado.</p>
+            <p class="text-center w-100 mt-5">Nenhuma peça cadastrada.</p>
         {% endfor %}
     </div>
 </div>

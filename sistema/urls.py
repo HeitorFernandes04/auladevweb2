@@ -6,7 +6,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
-    path('veiculo/', include('veiculo.urls'), name = 'veiculo'),
+    path('peca/', include('peca.urls'), name = 'peca'),
     path('anuncio/', include('anuncio.urls'), name = 'anuncio'),
     path('api/autenticacao-api/', LoginAPI.as_view(), name='autenticacao-api'),
 ]

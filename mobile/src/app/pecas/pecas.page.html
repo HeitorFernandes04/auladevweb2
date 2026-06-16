@@ -1,0 +1,168 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Minhas Peças</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirmarLogout()" color="primary" fill="clear">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Sair
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="saudacao">
+    <p>Olá, <strong>{{ nomeUsuario }}</strong>!</p>
+  </div>
+
+  <ion-item lines="none" class="filtro-categoria">
+    <ion-label position="stacked">Filtrar por categoria</ion-label>
+    <ion-select [(ngModel)]="categoriaFiltro" (ionChange)="filtrarPorCategoria()" placeholder="Todas">
+      <ion-select-option [value]="null">Todas</ion-select-option>
+      <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">
+        {{ opcao.label }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <div class="loading-container" *ngIf="carregando">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando peças...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!carregando && pecas.length === 0">
+    <ion-icon name="shirt-outline"></ion-icon>
+    <p>Nenhuma peça cadastrada.</p>
+  </div>
+
+  <!-- Lista centralizada em 2/3 da largura da tela -->
+  <div class="pecas-wrapper" *ngIf="!carregando && pecas.length > 0">
+    <div class="pecas-lista">
+      <ion-item-sliding *ngFor="let peca of pecas">
+
+        <!-- Deslizar para a DIREITA: Editar -->
+        <ion-item-options side="start">
+          <ion-item-option color="primary" (click)="editarPeca(peca)">
+            <ion-icon slot="top" name="pencil-outline"></ion-icon>
+            Editar
+          </ion-item-option>
+        </ion-item-options>
+
+        <!-- Card da peça -->
+        <ion-item lines="none" class="peca-item">
+          <div class="peca-card">
+
+            <div class="foto-container">
+              <!-- Foto carregada via base64 autenticado -->
+              <img
+                *ngIf="peca.foto && fotosSrc[peca.id]"
+                [src]="fotosSrc[peca.id]"
+                alt="Foto da peça"
+              />
+              <!-- Spinner enquanto a foto ainda está carregando -->
+              <div class="foto-carregando" *ngIf="peca.foto && !fotosSrc[peca.id]">
+                <ion-spinner name="crescent"></ion-spinner>
+              </div>
+              <!-- Sem foto cadastrada -->
+              <div class="sem-foto" *ngIf="!peca.foto">
+                <ion-icon name="shirt-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="peca-info">
+              <h2>{{ peca.nome_marca }} {{ peca.modelo }}</h2>
+              <div class="peca-detalhes">
+                <span class="tag">{{ peca.ano }}</span>
+                <span class="tag">{{ peca.nome_cor }}</span>
+                <span class="tag">Tam. {{ peca.nome_tamanho }}</span>
+                <span class="tag">{{ peca.nome_categoria }}</span>
+              </div>
+            </div>
+
+          </div>
+        </ion-item>
+
+        <!-- Deslizar para a ESQUERDA: Excluir -->
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="confirmarExclusao(peca)">
+            <ion-icon slot="top" name="trash-outline"></ion-icon>
+            Excluir
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+    </div>
+  </div>
+
+  <!-- Modal de Edição -->
+  <ion-modal [isOpen]="modalAberto" (didDismiss)="fecharModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Peça</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Modelo</ion-label>
+          <ion-input [(ngModel)]="pecaEditando.modelo" placeholder="Modelo"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Ano</ion-label>
+          <ion-input type="number" [(ngModel)]="pecaEditando.ano" placeholder="Ano"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Marca</ion-label>
+          <ion-select [(ngModel)]="pecaEditando.marca" placeholder="Selecione">
+            <ion-select-option *ngFor="let opcao of opcoesMarca" [value]="opcao.valor">
+              {{ opcao.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Cor</ion-label>
+          <ion-select [(ngModel)]="pecaEditando.cor" placeholder="Selecione">
+            <ion-select-option *ngFor="let opcao of opcoesCor" [value]="opcao.valor">
+              {{ opcao.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Tamanho</ion-label>
+          <ion-select [(ngModel)]="pecaEditando.tamanho" placeholder="Selecione">
+            <ion-select-option *ngFor="let opcao of opcoesTamanho" [value]="opcao.valor">
+              {{ opcao.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Categoria</ion-label>
+          <ion-select [(ngModel)]="pecaEditando.categoria" placeholder="Selecione">
+            <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">
+              {{ opcao.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" class="ion-margin-top" (click)="salvarEdicao()">
+          Salvar
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

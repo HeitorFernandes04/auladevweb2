@@ -2,7 +2,7 @@ from django.contrib import admin
 from anuncio.models import Anuncio
 
 class AnuncioAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'descricao', 'preco', 'veiculo', 'usuario')
+    list_display = ('titulo', 'descricao', 'preco', 'peca', 'usuario')
     search_fields = ('titulo', 'descricao')
 
 admin.site.register(Anuncio, AnuncioAdmin)
