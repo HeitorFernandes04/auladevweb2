@@ -1,0 +1,85 @@
+ion-toolbar {
+  --background: #ffffff;
+  --color: #000000;
+  --border-color: #e5e5e5;
+
+  ion-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  ion-back-button {
+    --color: #000000;
+  }
+}
+
+ion-content {
+  --background: #ffffff;
+}
+
+.modal-campo {
+  margin-bottom: 28px;
+}
+
+.modal-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+ion-input {
+  --background: transparent;
+  --color: #000000;
+  --placeholder-color: #6b6b6b;
+  --padding-start: 0;
+  --padding-end: 0;
+  --highlight-color-focused: #000000;
+  border-bottom: 1px solid #e5e5e5;
+  border-radius: 0;
+  font-size: 0.875rem;
+}
+
+ion-select {
+  --placeholder-color: #3d3d3d;
+  --color: #000000;
+  color: #000000;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 8px 0;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.foto-input {
+  width: 100%;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 0.875rem;
+  color: #000;
+  background: transparent;
+  cursor: pointer;
+}
+
+.foto-hint {
+  font-size: 0.7rem;
+  color: #6b6b6b;
+  margin: 4px 0 0 0;
+}
+
+.salvar-button {
+  --background: #000000;
+  --background-activated: #333333;
+  --color: #ffffff;
+  --border-radius: 0;
+  --box-shadow: none;
+  height: 52px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 16px;
+}

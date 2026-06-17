@@ -86,7 +86,7 @@
                 <ul class="hidden md:flex items-center gap-8">
                     <li>
                         <a href="{% url 'listar-anuncios' %}" class="text-xs uppercase tracking-widest hover:opacity-50 transition-opacity">
-                            Anúncios
+                            Meus Anúncios
                         </a>
                     </li>
                     <li>
@@ -123,7 +123,7 @@
             {% if user.is_authenticated %}
             <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
                 <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
-                    <a href="{% url 'listar-anuncios' %}" class="text-xs uppercase tracking-widest">Anúncios</a>
+                    <a href="{% url 'listar-anuncios' %}" class="text-xs uppercase tracking-widest">Meus Anúncios</a>
                     <a href="{% url 'listar-pecas' %}" class="text-xs uppercase tracking-widest">Peças</a>
                     <a href="{% url 'criar-peca' %}" class="text-xs uppercase tracking-widest">Nova Peça</a>
                 </div>

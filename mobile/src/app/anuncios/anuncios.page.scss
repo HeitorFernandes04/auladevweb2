@@ -1,0 +1,173 @@
+ion-toolbar {
+  --background: #ffffff;
+  --color: #000000;
+  --border-color: #e5e5e5;
+
+  ion-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  ion-back-button {
+    --color: #000000;
+  }
+}
+
+ion-content {
+  --background: #ffffff;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+  color: #9ca3af;
+
+  ion-spinner {
+    color: #000000;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #d1d5db;
+
+  ion-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9ca3af;
+    margin: 0;
+  }
+}
+
+.anuncios-lista {
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anuncio-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  width: 100%;
+}
+
+.anuncio-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  padding: 16px;
+
+  .anuncio-peca {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #9ca3af;
+    margin: 0 0 4px 0;
+  }
+
+  .anuncio-titulo {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 8px 0;
+  }
+
+  .anuncio-preco {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+  }
+}
+
+.option-editar {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  --ion-color-primary: #000000;
+}
+
+.option-excluir {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+// Modal
+ion-modal {
+  ion-toolbar {
+    --background: #ffffff;
+    --color: #000000;
+    --border-color: #e5e5e5;
+  }
+
+  .modal-content {
+    --background: #ffffff;
+  }
+
+  .modal-campo {
+    margin-bottom: 28px;
+  }
+
+  .modal-label {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #9ca3af;
+    margin-bottom: 6px;
+  }
+
+  ion-input, ion-textarea {
+    --background: transparent;
+    --color: #000000;
+    --placeholder-color: #d1d5db;
+    --padding-start: 0;
+    --padding-end: 0;
+    --highlight-color-focused: #000000;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 0;
+    font-size: 0.875rem;
+  }
+
+  .salvar-button {
+    --background: #000000;
+    --background-activated: #333333;
+    --color: #ffffff;
+    --border-radius: 0;
+    --box-shadow: none;
+    height: 52px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 16px;
+  }
+}

@@ -15,38 +15,65 @@ ion-toolbar {
   }
 }
 
+.toolbar-busca {
+  --padding-start: 0;
+  --padding-end: 0;
+  --min-height: 48px;
+
+  ion-searchbar {
+    --background: #f4f4f4;
+    --color: #000000;
+    --placeholder-color: #9ca3af;
+    --icon-color: #9ca3af;
+    --border-radius: 0;
+    --box-shadow: none;
+    padding: 4px 12px;
+    font-size: 0.875rem;
+  }
+}
+
+.toolbar-chips {
+  --padding-start: 0;
+  --padding-end: 0;
+  --min-height: 44px;
+  border-bottom: 1px solid #e5e5e5;
+
+  .chips-container {
+    display: flex;
+    gap: 8px;
+    padding: 6px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+
+    ion-chip {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      --background: #f4f4f4;
+      --color: #000000;
+      height: 28px;
+      margin: 0;
+
+      ion-icon { font-size: 12px; }
+
+      &.ativo {
+        --background: #000000;
+        --color: #ffffff;
+      }
+    }
+
+    .chip-limpar {
+      --background: transparent;
+      --color: #9ca3af;
+      border: 1px solid #e5e5e5;
+    }
+  }
+}
+
 ion-content {
   --background: #ffffff;
-}
-
-.saudacao {
-  padding: 16px 20px 4px;
-  text-align: center;
-
-  p {
-    font-size: 0.8rem;
-    color: #6b6b6b;
-    margin: 0;
-  }
-
-  strong {
-    color: #000000;
-    font-weight: 600;
-  }
-}
-
-.filtro-wrapper {
-  padding: 12px 20px 4px;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.filtro-select {
-  --placeholder-color: #6b6b6b;
-  --color: #000000;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  width: 100%;
 }
 
 .loading-container {
@@ -186,6 +213,14 @@ ion-content {
   --ion-color-primary: #000000;
 }
 
+.option-anunciar {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  --ion-color-primary: #333333;
+}
+
 .option-excluir {
   font-size: 0.7rem;
   font-weight: 600;
@@ -193,7 +228,7 @@ ion-content {
   text-transform: uppercase;
 }
 
-// Modal de edição
+// Modais
 ion-modal {
   ion-toolbar {
     --background: #ffffff;
@@ -237,6 +272,51 @@ ion-modal {
     padding: 8px 0;
     font-size: 0.875rem;
     width: 100%;
+  }
+
+  ion-textarea {
+    --background: transparent;
+    --color: #000000;
+    --placeholder-color: #d1d5db;
+    --padding-start: 0;
+    --padding-end: 0;
+    --highlight-color-focused: #000000;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 0;
+    font-size: 0.875rem;
+  }
+
+  .foto-preview {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border: 1px solid #e5e5e5;
+    margin-bottom: 8px;
+  }
+
+  .foto-input {
+    width: 100%;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 0.875rem;
+    color: #000;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .foto-hint {
+    font-size: 0.7rem;
+    color: #6b6b6b;
+    margin: 4px 0 0 0;
+  }
+
+  .peca-selecionada-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e5e5;
   }
 
   .salvar-button {

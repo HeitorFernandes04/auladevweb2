@@ -263,16 +263,17 @@ Para a especificação completa campo a campo, ver [`docs/02-modelo-de-dados.md`
 
 **API REST (consumida pelo app mobile):**
 - Autenticação por token (`/api/autenticacao-api/`).
-- Listagem de peças do sistema, com filtro por categoria (`GET /peca/api/listar/?categoria=`).
-- Atualização de peça (`PATCH/PUT /peca/api/editar/<pk>/`).
-- Exclusão de peça (`DELETE /peca/api/excluir/<pk>/`).
-- Download autenticado da foto da peça (`GET /peca/api/foto/<pk>/`).
+- CRUD completo de peças via API: listar (com filtro por categoria), criar, editar, excluir e download autenticado de foto.
+- CRUD completo de anúncios via API (`/anuncio/api/`): listar, criar, editar e excluir — sempre filtrado pelo usuário logado.
 
 **Mobile (Ionic/Angular/Capacitor):**
 - Tela de login que troca credenciais por token e persiste a sessão localmente (`@ionic/storage-angular`), com redirecionamento automático se já houver sessão salva.
 - Listagem de peças com pull-to-refresh (`ion-refresher`) e filtro por categoria.
-- Edição inline via modal (`ion-modal`) e exclusão com gesto de slide (`ion-item-sliding`) + confirmação (`AlertController`).
+- Criação de nova peça com upload de foto (página dedicada `/nova-peca`).
+- Edição inline via modal (`ion-modal`) com preview e troca de foto; exclusão com gesto de slide (`ion-item-sliding`) + confirmação (`AlertController`).
 - Carregamento de fotos autenticadas convertidas para base64 e exibidas por peça.
+- Botão "Anunciar" no swipe do card de peça: abre modal de criação de anúncio com peça pré-selecionada.
+- Tela "Meus Anúncios" (`/anuncios`): lista, edita e exclui os próprios anúncios.
 - Logout com confirmação, limpando o storage local.
 
 ## Rotas e endpoints
@@ -296,15 +297,30 @@ Para a especificação completa campo a campo, ver [`docs/02-modelo-de-dados.md`
 
 ### API REST (token)
 
+**Autenticação**
+
 | Método | Rota | View | Autenticação | Retorno |
 |---|---|---|---|---|
 | POST | `/api/autenticacao-api/` | `LoginAPI` | Pública (recebe `username`/`password`) | `{ id, nome, email, token }` |
+
+**Peça**
+
+| Método | Rota | View | Autenticação | Retorno |
+|---|---|---|---|---|
 | GET | `/peca/api/listar/?categoria=` | `APIListarPecas` | `Token` | Lista de peças (serializadas), filtrável por categoria |
+| POST | `/peca/api/novo/` | `APICriarPeca` | `Token` | Peça criada (`multipart/form-data`) |
 | GET | `/peca/api/foto/<pk>/` | `APIFotoPeca` | `Token` | Binário da imagem (`image/jpeg`) |
 | PUT/PATCH | `/peca/api/editar/<pk>/` | `APIEditarPeca` | `Token` | Peça atualizada |
 | DELETE | `/peca/api/excluir/<pk>/` | `APIExcluirPeca` | `Token` | `204 No Content` |
 
-> Não existe API para `Anuncio` — apenas para `Peca`. O app mobile, portanto, não gerencia anúncios hoje.
+**Anúncio** — todos os endpoints filtram por usuário logado
+
+| Método | Rota | View | Autenticação | Retorno |
+|---|---|---|---|---|
+| GET | `/anuncio/api/listar/` | `APIListarAnuncios` | `Token` | Lista de anúncios do usuário logado |
+| POST | `/anuncio/api/novo/` | `APICriarAnuncio` | `Token` | Anúncio criado |
+| PUT/PATCH | `/anuncio/api/editar/<pk>/` | `APIEditarAnuncio` | `Token` | Anúncio atualizado |
+| DELETE | `/anuncio/api/excluir/<pk>/` | `APIExcluirAnuncio` | `Token` | `204 No Content` |
 
 ## Metodologia e padrões de projeto
 

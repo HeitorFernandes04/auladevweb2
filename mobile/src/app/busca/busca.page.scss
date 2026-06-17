@@ -1,0 +1,183 @@
+ion-toolbar {
+  --background: #ffffff;
+  --color: #000000;
+  --border-color: #e5e5e5;
+
+  ion-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+}
+
+ion-content {
+  --background: #ffffff;
+}
+
+ion-searchbar {
+  --background: #f4f4f4;
+  --color: #000000;
+  --placeholder-color: #9ca3af;
+  --icon-color: #9ca3af;
+  --border-radius: 0;
+  --box-shadow: none;
+  padding: 8px 12px 0;
+  font-size: 0.875rem;
+}
+
+.chips-wrapper {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e5e5;
+
+  &::-webkit-scrollbar { display: none; }
+
+  ion-chip {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    --background: #f4f4f4;
+    --color: #000000;
+    height: 30px;
+
+    ion-icon { font-size: 14px; }
+
+    &.ativo {
+      --background: #000000;
+      --color: #ffffff;
+    }
+  }
+
+  .chip-limpar {
+    --background: transparent;
+    --color: #9ca3af;
+    border: 1px solid #e5e5e5;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+  color: #9ca3af;
+
+  ion-spinner {
+    color: #000000;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #d1d5db;
+
+  ion-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9ca3af;
+    margin: 0;
+  }
+}
+
+.pecas-lista {
+  padding: 20px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.peca-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  width: 100%;
+}
+
+.peca-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+
+  .foto-container {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .foto-carregando {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+
+      ion-spinner { color: #9ca3af; }
+    }
+
+    .sem-foto {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+
+      ion-icon { font-size: 48px; color: #d1d5db; }
+    }
+  }
+
+  .peca-info {
+    padding: 12px 16px 16px;
+
+    .peca-marca {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #9ca3af;
+      margin: 0 0 4px 0;
+    }
+
+    .peca-modelo {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+
+    .peca-detalhes {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      margin: 0;
+    }
+  }
+}

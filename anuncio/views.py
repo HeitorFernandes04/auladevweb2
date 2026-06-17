@@ -2,8 +2,12 @@ from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from anuncio.forms import FormularioAnuncio
+from anuncio.serializers import SerializadorAnuncio
 from peca.forms import FormularioPeca
 from .models import Anuncio
 
@@ -17,7 +21,7 @@ class ListarAnuncio(LoginRequiredMixin, ListView):
 
     def get_queryset(self, **kwargs):
         pesquisa = self.request.GET.get('pesquisa', None)
-        queryset = Anuncio.objects.all()
+        queryset = Anuncio.objects.filter(usuario=self.request.user)
         if pesquisa is not None:
             queryset = queryset.filter(
                 Q(titulo__icontains=pesquisa) | Q(peca__modelo__icontains=pesquisa)
@@ -48,3 +52,36 @@ class ExcluirAnuncio(LoginRequiredMixin, DeleteView):
     model = Anuncio
     template_name = 'anuncio/excluir.html'
     success_url = reverse_lazy('listar-anuncios')
+
+
+class APIListarAnuncios(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorAnuncio
+
+    def get_queryset(self):
+        return Anuncio.objects.filter(usuario=self.request.user)
+
+
+class APICriarAnuncio(CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorAnuncio
+
+
+class APIEditarAnuncio(RetrieveUpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorAnuncio
+
+    def get_queryset(self):
+        return Anuncio.objects.filter(usuario=self.request.user)
+
+
+class APIExcluirAnuncio(DestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorAnuncio
+
+    def get_queryset(self):
+        return Anuncio.objects.filter(usuario=self.request.user)

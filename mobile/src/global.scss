@@ -34,3 +34,57 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
+
+// ── Alert de logout ───────────────────────────────────────────────────────
+.alerta-logout {
+  .alert-wrapper {
+    border-radius: 0 !important;
+    overflow: hidden;
+
+    .alert-head {
+      background: #000000;
+      padding: 20px 20px 16px;
+
+      .alert-title {
+        color: #ffffff !important;
+        font-size: 0.7rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.2em !important;
+        text-transform: uppercase !important;
+      }
+    }
+
+    .alert-message {
+      font-size: 0.875rem;
+      color: #000000;
+      padding: 20px;
+    }
+
+    .alert-button-group {
+      padding: 0;
+      border-top: 1px solid #e5e5e5;
+      display: flex;
+      flex-direction: row;
+
+      .alert-button {
+        flex: 1;
+        border-radius: 0 !important;
+        font-size: 0.65rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.1em !important;
+        text-transform: uppercase !important;
+        padding: 16px !important;
+        margin: 0 !important;
+
+        &:first-child {
+          color: #9ca3af !important;
+          border-right: 1px solid #e5e5e5;
+        }
+
+        &:last-child {
+          color: #000000 !important;
+        }
+      }
+    }
+  }
+}

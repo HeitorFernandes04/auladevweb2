@@ -6,7 +6,7 @@ from peca.models import Peca
 from peca.forms import FormularioPeca
 from peca.consts import OPCOES_CATEGORIA
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework.generics import DestroyAPIView, ListAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from peca.serializers import SerializadorPeca
 from rest_framework.authentication import TokenAuthentication
@@ -73,6 +73,11 @@ class ExcluirPeca(LoginRequiredMixin, DeleteView):
     model = Peca
     template_name = 'peca/excluir.html'
     success_url = reverse_lazy('listar-pecas')
+
+class APICriarPeca(CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorPeca
 
 class APIListarPecas(ListAPIView):
 

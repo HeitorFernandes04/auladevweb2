@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Busca</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-searchbar
+    [(ngModel)]="textoBusca"
+    placeholder="Buscar peças..."
+    debounce="200"
+  ></ion-searchbar>
+
+  <div class="chips-wrapper">
+    <ion-chip [class.ativo]="!!filtroCategoria" (click)="abrirFiltro('categoria')">
+      <ion-label>{{ labelCategoria }}</ion-label>
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </ion-chip>
+    <ion-chip [class.ativo]="!!filtroMarca" (click)="abrirFiltro('marca')">
+      <ion-label>{{ labelMarca }}</ion-label>
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </ion-chip>
+    <ion-chip [class.ativo]="!!filtroTamanho" (click)="abrirFiltro('tamanho')">
+      <ion-label>{{ labelTamanho }}</ion-label>
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </ion-chip>
+    <ion-chip [class.ativo]="!!filtroCor" (click)="abrirFiltro('cor')">
+      <ion-label>{{ labelCor }}</ion-label>
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </ion-chip>
+    <ion-chip class="chip-limpar" *ngIf="temFiltroAtivo" (click)="limparFiltros()">
+      <ion-icon name="close-outline"></ion-icon>
+      <ion-label>Limpar</ion-label>
+    </ion-chip>
+  </div>
+
+  <!-- Carregando -->
+  <div class="loading-container" *ngIf="carregando">
+    <ion-spinner name="lines-small"></ion-spinner>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Estado vazio -->
+  <div class="empty-state" *ngIf="!carregando && pecasFiltradas.length === 0">
+    <ion-icon name="search-outline"></ion-icon>
+    <p>Nenhuma peça encontrada.</p>
+  </div>
+
+  <!-- Lista de resultados -->
+  <div class="pecas-lista" *ngIf="!carregando && pecasFiltradas.length > 0">
+    <ion-item *ngFor="let peca of pecasFiltradas" lines="none" class="peca-item">
+      <div class="peca-card">
+        <div class="foto-container">
+          <img
+            *ngIf="peca.foto && fotosSrc[peca.id]"
+            [src]="fotosSrc[peca.id]"
+            alt="Foto da peça"
+          />
+          <div class="foto-carregando" *ngIf="peca.foto && !fotosSrc[peca.id]">
+            <ion-spinner name="lines-small"></ion-spinner>
+          </div>
+          <div class="sem-foto" *ngIf="!peca.foto">
+            <ion-icon name="shirt-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="peca-info">
+          <p class="peca-marca">{{ peca.nome_marca }}</p>
+          <p class="peca-modelo">{{ peca.modelo }}</p>
+          <p class="peca-detalhes">{{ peca.nome_cor }} · Tam. {{ peca.nome_tamanho }} · {{ peca.nome_categoria }}</p>
+        </div>
+      </div>
+    </ion-item>
+  </div>
+
+</ion-content>

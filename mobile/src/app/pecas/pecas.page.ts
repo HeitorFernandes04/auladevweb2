@@ -4,10 +4,16 @@ import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonItem, IonLabel, IonButton, IonButtons, IonSpinner, IonIcon,
-  IonRefresher, IonRefresherContent, IonModal, IonInput,
+  IonRefresher, IonRefresherContent, IonModal, IonInput, IonTextarea,
   IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
-  ToastController, AlertController, NavController, LoadingController,
+  IonSearchbar, IonChip,
+  AlertController, NavController, LoadingController, ToastController, ActionSheetController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  shirtOutline, pencilOutline, megaphoneOutline, trashOutline,
+  closeOutline, chevronDownOutline, searchOutline,
+} from 'ionicons/icons';
 import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
 import { Peca } from './pecas.model';
 import { Storage } from '@ionic/storage-angular';
@@ -24,23 +30,36 @@ import { environment } from 'src/environments/environment';
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonItem, IonLabel, IonButton, IonButtons, IonSpinner, IonIcon,
-    IonRefresher, IonRefresherContent, IonModal, IonInput,
+    IonRefresher, IonRefresherContent, IonModal, IonInput, IonTextarea,
     IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
+    IonSearchbar, IonChip,
   ],
 })
 export class PecasPage implements OnInit {
   pecas: Peca[] = [];
   carregando = true;
-  nomeUsuario = '';
+  usuario!: Usuario;
+
+  fotosSrc: { [id: number]: string } = {};
+
+  // Busca e filtros
+  textoBusca = '';
+  filtroCategoria: number | null = null;
+  filtroMarca: number | null = null;
+  filtroTamanho: number | null = null;
+  filtroCor: number | null = null;
+
+  // Modal de edição de peça
   modalAberto = false;
   pecaEditando: Partial<Peca> = {};
   pecaEditandoId: number | null = null;
-  usuario!: Usuario;
-  lista_pecas: any[] = [];
-  categoriaFiltro: number | null = null;
+  fotoAtualSrc = '';
+  fotoNova: File | null = null;
 
-  // Mapa de id → src base64 da foto
-  fotosSrc: { [id: number]: string } = {};
+  // Modal de criação de anúncio
+  modalAnuncioAberto = false;
+  pecaSelecionada: Peca | null = null;
+  novoAnuncio = { titulo: '', descricao: '', preco: null as number | null };
 
   readonly opcoesMarca = OPCOES_MARCA;
   readonly opcoesCor = OPCOES_COR;
@@ -53,7 +72,10 @@ export class PecasPage implements OnInit {
     public controle_navegacao: NavController,
     public controle_alerta: AlertController,
     public controle_toast: ToastController,
-  ) {}
+    public actionSheetCtrl: ActionSheetController,
+  ) {
+    addIcons({ shirtOutline, pencilOutline, megaphoneOutline, trashOutline, closeOutline, chevronDownOutline, searchOutline });
+  }
 
   async ngOnInit() {
     await this.storage.create();
@@ -61,10 +83,15 @@ export class PecasPage implements OnInit {
 
     if (registro) {
       this.usuario = Object.assign(new Usuario(), registro);
-      this.nomeUsuario = this.usuario.nome || 'Usuário';
       this.consultarPecas();
     } else {
       this.controle_navegacao.navigateRoot('/home');
+    }
+  }
+
+  async ionViewWillEnter() {
+    if (this.usuario?.token) {
+      await this.consultarPecas();
     }
   }
 
@@ -73,23 +100,84 @@ export class PecasPage implements OnInit {
     event.target.complete();
   }
 
-  async filtrarPorCategoria() {
-    await this.consultarPecas();
+  // ── Busca e filtros ───────────────────────────────────────────────────────
+  get pecasFiltradas(): Peca[] {
+    return this.pecas.filter(p => {
+      const texto = this.textoBusca.toLowerCase().trim();
+      const matchTexto = !texto ||
+        p.modelo?.toLowerCase().includes(texto) ||
+        p.nome_marca?.toLowerCase().includes(texto) ||
+        p.nome_categoria?.toLowerCase().includes(texto);
+      const matchCategoria = !this.filtroCategoria || p.categoria === this.filtroCategoria;
+      const matchMarca = !this.filtroMarca || p.marca === this.filtroMarca;
+      const matchTamanho = !this.filtroTamanho || p.tamanho === this.filtroTamanho;
+      const matchCor = !this.filtroCor || p.cor === this.filtroCor;
+      return matchTexto && matchCategoria && matchMarca && matchTamanho && matchCor;
+    });
+  }
+
+  get temFiltroAtivo(): boolean {
+    return !!(this.filtroCategoria || this.filtroMarca || this.filtroTamanho || this.filtroCor || this.textoBusca);
+  }
+
+  get labelCategoria(): string {
+    return OPCOES_CATEGORIA.find(o => o.valor === this.filtroCategoria)?.label ?? 'Categoria';
+  }
+
+  get labelMarca(): string {
+    return OPCOES_MARCA.find(o => o.valor === this.filtroMarca)?.label ?? 'Marca';
+  }
+
+  get labelTamanho(): string {
+    return OPCOES_TAMANHO.find(o => o.valor === this.filtroTamanho)?.label ?? 'Tamanho';
+  }
+
+  get labelCor(): string {
+    return OPCOES_COR.find(o => o.valor === this.filtroCor)?.label ?? 'Cor';
+  }
+
+  limparFiltros() {
+    this.filtroCategoria = null;
+    this.filtroMarca = null;
+    this.filtroTamanho = null;
+    this.filtroCor = null;
+    this.textoBusca = '';
+  }
+
+  async abrirFiltro(tipo: 'categoria' | 'marca' | 'tamanho' | 'cor') {
+    const configs: Record<string, { opcoes: { valor: number; label: string }[]; header: string }> = {
+      categoria: { opcoes: OPCOES_CATEGORIA, header: 'Categoria' },
+      marca:     { opcoes: OPCOES_MARCA,     header: 'Marca'     },
+      tamanho:   { opcoes: OPCOES_TAMANHO,   header: 'Tamanho'   },
+      cor:       { opcoes: OPCOES_COR,       header: 'Cor'       },
+    };
+
+    const { opcoes, header } = configs[tipo];
+
+    const sheet = await this.actionSheetCtrl.create({
+      header,
+      buttons: [
+        ...opcoes.map(opcao => ({
+          text: opcao.label,
+          handler: () => {
+            if (tipo === 'categoria') this.filtroCategoria = opcao.valor;
+            else if (tipo === 'marca') this.filtroMarca = opcao.valor;
+            else if (tipo === 'tamanho') this.filtroTamanho = opcao.valor;
+            else this.filtroCor = opcao.valor;
+          },
+        })),
+        { text: 'Cancelar', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
   }
 
   // ── Fotos autenticadas ────────────────────────────────────────────────────
-  /**
-   * Busca a foto via CapacitorHttp (com token), converte para base64
-   * e armazena em fotosSrc para uso no template.
-   * CapacitorHttp retorna binários como string base64 quando responseType = 'blob'.
-   */
   private carregarFoto(peca: Peca) {
     if (!peca.foto || this.fotosSrc[peca.id]) return;
 
     const options: HttpOptions = {
-      headers: {
-        'Authorization': `Token ${this.usuario.token}`,
-      },
+      headers: { 'Authorization': `Token ${this.usuario.token}` },
       url: `${environment.apiUrl}/peca/api/foto/${peca.id}/`,
       responseType: 'blob',
     };
@@ -97,7 +185,6 @@ export class PecasPage implements OnInit {
     CapacitorHttp.get(options)
       .then((resposta: HttpResponse) => {
         if (resposta.status === 200 && resposta.data) {
-          // CapacitorHttp com responseType 'blob' retorna base64 diretamente em resposta.data
           this.fotosSrc[peca.id] = `data:image/jpeg;base64,${resposta.data}`;
         }
       })
@@ -113,25 +200,18 @@ export class PecasPage implements OnInit {
     const loading = await this.controle_caregamento.create({ message: 'Carregando peças...' });
     await loading.present();
 
-    let url = `${environment.apiUrl}/peca/api/listar/`;
-    if (this.categoriaFiltro) {
-      url += `?categoria=${this.categoriaFiltro}`;
-    }
-
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Token ${this.usuario.token}`,
       },
-      url,
+      url: `${environment.apiUrl}/peca/api/listar/`,
     };
 
     CapacitorHttp.get(options)
       .then((resposta: HttpResponse) => {
         if (resposta.status === 200) {
-          this.lista_pecas = resposta.data;
           this.pecas = resposta.data;
-          // Zera o cache de fotos e recarrega
           this.fotosSrc = {};
           this.carregarTodasFotos(this.pecas);
         } else {
@@ -159,6 +239,8 @@ export class PecasPage implements OnInit {
       tamanho:   peca.tamanho,
       categoria: peca.categoria,
     };
+    this.fotoAtualSrc = this.fotosSrc[peca.id] || '';
+    this.fotoNova = null;
     this.modalAberto = true;
   }
 
@@ -166,31 +248,57 @@ export class PecasPage implements OnInit {
     this.modalAberto = false;
     this.pecaEditando = {};
     this.pecaEditandoId = null;
+    this.fotoAtualSrc = '';
+    this.fotoNova = null;
+  }
+
+  onFotoNovaSelecionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.fotoNova = input.files[0];
+    }
   }
 
   async salvarEdicao() {
     if (!this.pecaEditandoId) return;
 
-    const payload = {
-      modelo:    this.pecaEditando.modelo,
-      ano:       this.pecaEditando.ano,
-      marca:     this.pecaEditando.marca,
-      cor:       this.pecaEditando.cor,
-      tamanho:   this.pecaEditando.tamanho,
-      categoria: this.pecaEditando.categoria,
-    };
-
     const loading = await this.controle_caregamento.create({ message: 'Salvando...' });
     await loading.present();
 
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`,
-      },
-      url: `${environment.apiUrl}/peca/api/editar/${this.pecaEditandoId}/`,
-      data: payload,
-    };
+    let options: HttpOptions;
+
+    if (this.fotoNova) {
+      const formData = new FormData();
+      formData.append('modelo',    this.pecaEditando.modelo!);
+      formData.append('ano',       String(this.pecaEditando.ano));
+      formData.append('marca',     String(this.pecaEditando.marca));
+      formData.append('cor',       String(this.pecaEditando.cor));
+      formData.append('tamanho',   String(this.pecaEditando.tamanho));
+      formData.append('categoria', String(this.pecaEditando.categoria));
+      formData.append('foto',      this.fotoNova);
+
+      options = {
+        headers: { 'Authorization': `Token ${this.usuario.token}` },
+        url: `${environment.apiUrl}/peca/api/editar/${this.pecaEditandoId}/`,
+        data: formData,
+      };
+    } else {
+      options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${this.usuario.token}`,
+        },
+        url: `${environment.apiUrl}/peca/api/editar/${this.pecaEditandoId}/`,
+        data: {
+          modelo:    this.pecaEditando.modelo,
+          ano:       this.pecaEditando.ano,
+          marca:     this.pecaEditando.marca,
+          cor:       this.pecaEditando.cor,
+          tamanho:   this.pecaEditando.tamanho,
+          categoria: this.pecaEditando.categoria,
+        },
+      };
+    }
 
     CapacitorHttp.patch(options)
       .then((resposta: HttpResponse) => {
@@ -205,6 +313,59 @@ export class PecasPage implements OnInit {
       .catch((erro: any) => {
         console.error(erro);
         this.apresenta_mensagem(`Erro de conexão: ${erro?.status ?? 'desconhecido'}`);
+      })
+      .finally(async () => await loading.dismiss());
+  }
+
+  // ── Anunciar ──────────────────────────────────────────────────────────────
+  abrirModalAnuncio(peca: Peca) {
+    this.pecaSelecionada = peca;
+    this.novoAnuncio = { titulo: '', descricao: '', preco: null };
+    this.modalAnuncioAberto = true;
+  }
+
+  fecharModalAnuncio() {
+    this.modalAnuncioAberto = false;
+    this.pecaSelecionada = null;
+    this.novoAnuncio = { titulo: '', descricao: '', preco: null };
+  }
+
+  async publicarAnuncio() {
+    if (!this.pecaSelecionada) return;
+    if (!this.novoAnuncio.titulo || !this.novoAnuncio.preco) {
+      await this.apresenta_mensagem('Preencha título e preço.');
+      return;
+    }
+
+    const loading = await this.controle_caregamento.create({ message: 'Publicando anúncio...' });
+    await loading.present();
+
+    const options: HttpOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${this.usuario.token}`,
+      },
+      url: `${environment.apiUrl}/anuncio/api/novo/`,
+      data: {
+        titulo:    this.novoAnuncio.titulo,
+        descricao: this.novoAnuncio.descricao,
+        preco:     this.novoAnuncio.preco,
+        peca:      this.pecaSelecionada.id,
+      },
+    };
+
+    CapacitorHttp.post(options)
+      .then(async (resposta: HttpResponse) => {
+        if (resposta.status === 201) {
+          await this.apresenta_mensagem('Anúncio publicado com sucesso!');
+          this.fecharModalAnuncio();
+        } else {
+          await this.apresenta_mensagem(`Erro ao publicar: ${resposta.status}`);
+        }
+      })
+      .catch(async (erro: any) => {
+        console.error(erro);
+        await this.apresenta_mensagem(`Erro de conexão: ${erro?.status ?? 'desconhecido'}`);
       })
       .finally(async () => await loading.dismiss());
   }
@@ -253,26 +414,6 @@ export class PecasPage implements OnInit {
         this.apresenta_mensagem(`Erro de conexão: ${erro?.status ?? 'desconhecido'}`);
       })
       .finally(async () => await loading.dismiss());
-  }
-
-  // ── Logout ────────────────────────────────────────────────────────────────
-  async confirmarLogout() {
-    const alerta = await this.controle_alerta.create({
-      header: 'Sair',
-      message: 'Deseja realmente sair da sua conta?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Sair',
-          role: 'destructive',
-          handler: async () => {
-            await this.storage.remove('usuario');
-            this.controle_navegacao.navigateRoot('/', { animationDirection: 'back' });
-          },
-        },
-      ],
-    });
-    await alerta.present();
   }
 
   // ── Toast ─────────────────────────────────────────────────────────────────

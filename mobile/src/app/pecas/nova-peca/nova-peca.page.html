@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/pecas" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nova Peça</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div class="modal-campo">
+    <label class="modal-label">Modelo *</label>
+    <ion-input [(ngModel)]="novaPeca.modelo" placeholder="Ex: Camiseta Polo"></ion-input>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Ano *</label>
+    <ion-input type="number" [(ngModel)]="novaPeca.ano" placeholder="Ano"></ion-input>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Marca *</label>
+    <ion-select [(ngModel)]="novaPeca.marca" placeholder="Selecione" interface="action-sheet">
+      <ion-select-option *ngFor="let opcao of opcoesMarca" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Cor *</label>
+    <ion-select [(ngModel)]="novaPeca.cor" placeholder="Selecione" interface="action-sheet">
+      <ion-select-option *ngFor="let opcao of opcoesCor" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Tamanho *</label>
+    <ion-select [(ngModel)]="novaPeca.tamanho" placeholder="Selecione" interface="action-sheet">
+      <ion-select-option *ngFor="let opcao of opcoesTamanho" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Categoria *</label>
+    <ion-select [(ngModel)]="novaPeca.categoria" placeholder="Selecione" interface="action-sheet">
+      <ion-select-option *ngFor="let opcao of opcoesCategoria" [value]="opcao.valor">{{ opcao.label }}</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="modal-campo">
+    <label class="modal-label">Foto</label>
+    <input type="file" accept="image/*" (change)="onFotoSelecionada($event)" class="foto-input" />
+    <p class="foto-hint" *ngIf="fotoSelecionada">{{ fotoSelecionada.name }}</p>
+  </div>
+
+  <ion-button expand="block" class="salvar-button ion-margin-top" (click)="salvar()">
+    Salvar Peça
+  </ion-button>
+
+</ion-content>

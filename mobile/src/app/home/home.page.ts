@@ -40,7 +40,7 @@ export class HomePage implements OnInit {
     // Se já existe sessão salva, vai direto para peças
     const registro = await this.storage.get('usuario');
     if (registro) {
-      this.controle_navegacao.navigateRoot('/pecas');
+      this.controle_navegacao.navigateRoot('/tabs/pecas');
     }
   }
 
@@ -69,7 +69,7 @@ export class HomePage implements OnInit {
         if (resposta.status === 200) {
           const usuario: Usuario = Object.assign(new Usuario(), resposta.data);
           await this.storage.set('usuario', usuario);
-          this.controle_navegacao.navigateRoot('/pecas');
+          this.controle_navegacao.navigateRoot('/tabs/pecas');
         } else {
           await this.apresenta_mensagem('Usuário ou senha inválidos.');
         }
