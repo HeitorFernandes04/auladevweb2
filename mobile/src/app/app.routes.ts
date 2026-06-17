@@ -26,7 +26,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'pecas',
+        redirectTo: 'anuncios',
         pathMatch: 'full',
       },
     ],

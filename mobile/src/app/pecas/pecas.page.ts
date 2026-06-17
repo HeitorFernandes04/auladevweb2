@@ -5,14 +5,13 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonItem, IonLabel, IonButton, IonButtons, IonSpinner, IonIcon,
   IonRefresher, IonRefresherContent, IonModal, IonInput, IonTextarea,
-  IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
-  IonSearchbar, IonChip,
+  IonSelect, IonSelectOption,
   AlertController, NavController, LoadingController, ToastController, ActionSheetController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   shirtOutline, pencilOutline, megaphoneOutline, trashOutline,
-  closeOutline, chevronDownOutline, searchOutline,
+  closeOutline, ellipsisVertical,
 } from 'ionicons/icons';
 import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
 import { Peca } from './pecas.model';
@@ -31,8 +30,7 @@ import { environment } from 'src/environments/environment';
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonItem, IonLabel, IonButton, IonButtons, IonSpinner, IonIcon,
     IonRefresher, IonRefresherContent, IonModal, IonInput, IonTextarea,
-    IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
-    IonSearchbar, IonChip,
+    IonSelect, IonSelectOption,
   ],
 })
 export class PecasPage implements OnInit {
@@ -41,13 +39,6 @@ export class PecasPage implements OnInit {
   usuario!: Usuario;
 
   fotosSrc: { [id: number]: string } = {};
-
-  // Busca e filtros
-  textoBusca = '';
-  filtroCategoria: number | null = null;
-  filtroMarca: number | null = null;
-  filtroTamanho: number | null = null;
-  filtroCor: number | null = null;
 
   // Modal de edição de peça
   modalAberto = false;
@@ -61,9 +52,9 @@ export class PecasPage implements OnInit {
   pecaSelecionada: Peca | null = null;
   novoAnuncio = { titulo: '', descricao: '', preco: null as number | null };
 
-  readonly opcoesMarca = OPCOES_MARCA;
-  readonly opcoesCor = OPCOES_COR;
-  readonly opcoesTamanho = OPCOES_TAMANHO;
+  readonly opcoesMarca    = OPCOES_MARCA;
+  readonly opcoesCor      = OPCOES_COR;
+  readonly opcoesTamanho  = OPCOES_TAMANHO;
   readonly opcoesCategoria = OPCOES_CATEGORIA;
 
   constructor(
@@ -74,7 +65,7 @@ export class PecasPage implements OnInit {
     public controle_toast: ToastController,
     public actionSheetCtrl: ActionSheetController,
   ) {
-    addIcons({ shirtOutline, pencilOutline, megaphoneOutline, trashOutline, closeOutline, chevronDownOutline, searchOutline });
+    addIcons({ shirtOutline, pencilOutline, megaphoneOutline, trashOutline, closeOutline, ellipsisVertical });
   }
 
   async ngOnInit() {
@@ -100,72 +91,26 @@ export class PecasPage implements OnInit {
     event.target.complete();
   }
 
-  // ── Busca e filtros ───────────────────────────────────────────────────────
-  get pecasFiltradas(): Peca[] {
-    return this.pecas.filter(p => {
-      const texto = this.textoBusca.toLowerCase().trim();
-      const matchTexto = !texto ||
-        p.modelo?.toLowerCase().includes(texto) ||
-        p.nome_marca?.toLowerCase().includes(texto) ||
-        p.nome_categoria?.toLowerCase().includes(texto);
-      const matchCategoria = !this.filtroCategoria || p.categoria === this.filtroCategoria;
-      const matchMarca = !this.filtroMarca || p.marca === this.filtroMarca;
-      const matchTamanho = !this.filtroTamanho || p.tamanho === this.filtroTamanho;
-      const matchCor = !this.filtroCor || p.cor === this.filtroCor;
-      return matchTexto && matchCategoria && matchMarca && matchTamanho && matchCor;
-    });
-  }
-
-  get temFiltroAtivo(): boolean {
-    return !!(this.filtroCategoria || this.filtroMarca || this.filtroTamanho || this.filtroCor || this.textoBusca);
-  }
-
-  get labelCategoria(): string {
-    return OPCOES_CATEGORIA.find(o => o.valor === this.filtroCategoria)?.label ?? 'Categoria';
-  }
-
-  get labelMarca(): string {
-    return OPCOES_MARCA.find(o => o.valor === this.filtroMarca)?.label ?? 'Marca';
-  }
-
-  get labelTamanho(): string {
-    return OPCOES_TAMANHO.find(o => o.valor === this.filtroTamanho)?.label ?? 'Tamanho';
-  }
-
-  get labelCor(): string {
-    return OPCOES_COR.find(o => o.valor === this.filtroCor)?.label ?? 'Cor';
-  }
-
-  limparFiltros() {
-    this.filtroCategoria = null;
-    this.filtroMarca = null;
-    this.filtroTamanho = null;
-    this.filtroCor = null;
-    this.textoBusca = '';
-  }
-
-  async abrirFiltro(tipo: 'categoria' | 'marca' | 'tamanho' | 'cor') {
-    const configs: Record<string, { opcoes: { valor: number; label: string }[]; header: string }> = {
-      categoria: { opcoes: OPCOES_CATEGORIA, header: 'Categoria' },
-      marca:     { opcoes: OPCOES_MARCA,     header: 'Marca'     },
-      tamanho:   { opcoes: OPCOES_TAMANHO,   header: 'Tamanho'   },
-      cor:       { opcoes: OPCOES_COR,       header: 'Cor'       },
-    };
-
-    const { opcoes, header } = configs[tipo];
-
+  // ── Menu ⋮ (substituiu o swipe no grid) ──────────────────────────────────
+  async abrirMenuOpcoes(peca: Peca) {
     const sheet = await this.actionSheetCtrl.create({
-      header,
       buttons: [
-        ...opcoes.map(opcao => ({
-          text: opcao.label,
-          handler: () => {
-            if (tipo === 'categoria') this.filtroCategoria = opcao.valor;
-            else if (tipo === 'marca') this.filtroMarca = opcao.valor;
-            else if (tipo === 'tamanho') this.filtroTamanho = opcao.valor;
-            else this.filtroCor = opcao.valor;
-          },
-        })),
+        {
+          text: 'Editar',
+          icon: 'pencil-outline',
+          handler: () => { this.editarPeca(peca); },
+        },
+        {
+          text: 'Anunciar',
+          icon: 'megaphone-outline',
+          handler: () => { this.abrirModalAnuncio(peca); },
+        },
+        {
+          text: 'Excluir',
+          icon: 'trash-outline',
+          role: 'destructive',
+          handler: () => { this.confirmarExclusao(peca); },
+        },
         { text: 'Cancelar', role: 'cancel' },
       ],
     });

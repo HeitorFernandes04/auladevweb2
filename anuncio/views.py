@@ -54,6 +54,15 @@ class ExcluirAnuncio(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('listar-anuncios')
 
 
+class APIListarTodosAnuncios(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SerializadorAnuncio
+
+    def get_queryset(self):
+        return Anuncio.objects.all().order_by('-data_criacao')
+
+
 class APIListarAnuncios(ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

@@ -1,6 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Meus Anúncios</ion-title>
+    <ion-title>ANÚNCIOS</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalCriar()" fill="clear">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -9,6 +14,35 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  <!-- Busca -->
+  <div class="searchbar-container">
+    <ion-searchbar
+      [(ngModel)]="textoBusca"
+      placeholder="Buscar anúncios..."
+      [debounce]="200"
+    ></ion-searchbar>
+  </div>
+
+  <!-- Chips de filtro -->
+  <div class="filtros-container">
+    <ion-chip [class.ativo]="filtroCategoria !== null" (click)="abrirFiltro('categoria')">
+      Categoria
+    </ion-chip>
+    <ion-chip [class.ativo]="filtroMarca !== null" (click)="abrirFiltro('marca')">
+      Marca
+    </ion-chip>
+    <ion-chip [class.ativo]="filtroTamanho !== null" (click)="abrirFiltro('tamanho')">
+      Tamanho
+    </ion-chip>
+    <ion-chip [class.ativo]="filtroCor !== null" (click)="abrirFiltro('cor')">
+      Cor
+    </ion-chip>
+    <ion-chip class="chip-limpar" *ngIf="temFiltroAtivo" (click)="limparFiltros()">
+      <ion-icon name="close-circle"></ion-icon>
+      Limpar
+    </ion-chip>
+  </div>
+
   <!-- Carregando -->
   <div class="loading-container" *ngIf="carregando">
     <ion-spinner name="lines-small"></ion-spinner>
@@ -16,17 +50,17 @@
   </div>
 
   <!-- Estado vazio -->
-  <div class="empty-state" *ngIf="!carregando && anuncios.length === 0">
+  <div class="empty-state" *ngIf="!carregando && anunciosFiltrados.length === 0">
     <ion-icon name="megaphone-outline"></ion-icon>
-    <p>Nenhum anúncio publicado ainda.</p>
+    <p>Nenhum anúncio encontrado.</p>
   </div>
 
-  <!-- Lista de anúncios -->
-  <div class="anuncios-lista" *ngIf="!carregando && anuncios.length > 0">
-    <ion-item-sliding *ngFor="let anuncio of anuncios">
+  <!-- Lista de anúncios (vitrine) -->
+  <div class="anuncios-lista" *ngIf="!carregando && anunciosFiltrados.length > 0">
+    <ion-item-sliding *ngFor="let anuncio of anunciosFiltrados">
 
-      <!-- Deslizar para a DIREITA: Editar -->
-      <ion-item-options side="start">
+      <!-- Swipe esquerda: Editar — só para próprios anúncios -->
+      <ion-item-options side="start" *ngIf="anuncio.usuario_id === usuario?.id">
         <ion-item-option (click)="editarAnuncio(anuncio)" class="option-editar">
           <ion-icon slot="top" name="pencil-outline"></ion-icon>
           Editar
@@ -36,14 +70,33 @@
       <!-- Card do anúncio -->
       <ion-item lines="none" class="anuncio-item">
         <div class="anuncio-card">
-          <p class="anuncio-peca">{{ anuncio.nome_peca }}</p>
-          <p class="anuncio-titulo">{{ anuncio.titulo }}</p>
-          <p class="anuncio-preco">R$ {{ anuncio.preco | number:'1.2-2' }}</p>
+
+          <!-- Foto -->
+          <div class="foto-container">
+            <img
+              *ngIf="fotosSrc[anuncio.peca]"
+              [src]="fotosSrc[anuncio.peca]"
+              alt="{{ anuncio.titulo }}"
+            />
+            <div class="foto-placeholder" *ngIf="!fotosSrc[anuncio.peca]">
+              <ion-icon name="shirt-outline"></ion-icon>
+            </div>
+          </div>
+
+          <!-- Informações -->
+          <div class="anuncio-info">
+            <p class="anuncio-marca">{{ anuncio.nome_marca }}</p>
+            <p class="anuncio-titulo">{{ anuncio.titulo }}</p>
+            <p class="anuncio-detalhe">{{ anuncio.nome_categoria }} · Tam. {{ anuncio.nome_tamanho }}</p>
+            <p class="anuncio-preco">R$ {{ anuncio.preco | number:'1.2-2' }}</p>
+            <span class="badge-meu" *ngIf="anuncio.usuario_id === usuario?.id">Seu anúncio</span>
+          </div>
+
         </div>
       </ion-item>
 
-      <!-- Deslizar para a ESQUERDA: Excluir -->
-      <ion-item-options side="end">
+      <!-- Swipe direita: Excluir — só para próprios anúncios -->
+      <ion-item-options side="end" *ngIf="anuncio.usuario_id === usuario?.id">
         <ion-item-option color="danger" (click)="confirmarExclusao(anuncio)" class="option-excluir">
           <ion-icon slot="top" name="trash-outline"></ion-icon>
           Excluir
@@ -68,25 +121,94 @@
       </ion-header>
 
       <ion-content class="modal-content ion-padding">
-
         <div class="modal-campo">
-          <label class="modal-label">Título</label>
-          <ion-input [(ngModel)]="anuncioEditando.titulo" placeholder="Título do anúncio"></ion-input>
+          <label class="modal-label" for="editar-titulo">Título</label>
+          <ion-input id="editar-titulo" [(ngModel)]="anuncioEditando.titulo" placeholder="Título do anúncio"></ion-input>
         </div>
-
         <div class="modal-campo">
-          <label class="modal-label">Descrição</label>
-          <ion-textarea [(ngModel)]="anuncioEditando.descricao" placeholder="Descrição" rows="4" auto-grow="true"></ion-textarea>
+          <label class="modal-label" for="editar-descricao">Descrição</label>
+          <ion-textarea id="editar-descricao" [(ngModel)]="anuncioEditando.descricao" placeholder="Descrição" rows="4" auto-grow="true"></ion-textarea>
         </div>
-
         <div class="modal-campo">
-          <label class="modal-label">Preço (R$)</label>
-          <ion-input type="number" [(ngModel)]="anuncioEditando.preco" placeholder="0,00"></ion-input>
+          <label class="modal-label" for="editar-preco">Preço (R$)</label>
+          <ion-input id="editar-preco" type="number" [(ngModel)]="anuncioEditando.preco" placeholder="0,00"></ion-input>
         </div>
-
         <ion-button expand="block" class="salvar-button ion-margin-top" (click)="salvarEdicao()">
           Salvar Alterações
         </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Criação (2 etapas) -->
+  <ion-modal [isOpen]="modalCriarAberto" (didDismiss)="fecharModalCriar()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start" *ngIf="etapaCriar === 'preencher'">
+            <ion-button (click)="voltarParaSelecao()" fill="clear">
+              <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title>{{ etapaCriar === 'selecionar' ? 'Selecionar Peça' : 'Novo Anúncio' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalCriar()" fill="clear">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content ion-padding">
+
+        <!-- Etapa 1: Selecionar peça -->
+        <ng-container *ngIf="etapaCriar === 'selecionar'">
+          <p class="selecionar-hint">Selecione a peça que deseja anunciar</p>
+
+          <div class="loading-container" *ngIf="carregandoPecas">
+            <ion-spinner name="lines-small"></ion-spinner>
+          </div>
+
+          <div class="empty-state" *ngIf="!carregandoPecas && pecasDisponiveis.length === 0">
+            <ion-icon name="shirt-outline"></ion-icon>
+            <p>Você não tem peças cadastradas.</p>
+          </div>
+
+          <div class="lista-pecas" *ngIf="!carregandoPecas && pecasDisponiveis.length > 0">
+            <button
+              class="peca-opcao"
+              *ngFor="let peca of pecasDisponiveis"
+              (click)="selecionarPecaCriar(peca)"
+            >
+              <p class="peca-opcao-marca">{{ peca.nome_marca }}</p>
+              <p class="peca-opcao-modelo">{{ peca.modelo }}</p>
+              <p class="peca-opcao-detalhe">{{ peca.nome_categoria }} · Tam. {{ peca.nome_tamanho }}</p>
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Etapa 2: Preencher formulário -->
+        <ng-container *ngIf="etapaCriar === 'preencher'">
+          <div class="modal-campo" *ngIf="pecaSelecionadaCriar">
+            <p class="modal-label">Peça</p>
+            <p class="peca-selecionada-label">{{ pecaSelecionadaCriar.nome_marca }} — {{ pecaSelecionadaCriar.modelo }}</p>
+          </div>
+          <div class="modal-campo">
+            <label class="modal-label" for="novo-titulo">Título *</label>
+            <ion-input id="novo-titulo" [(ngModel)]="novoAnuncio.titulo" placeholder="Ex: Camiseta Nike tam. M seminova"></ion-input>
+          </div>
+          <div class="modal-campo">
+            <label class="modal-label" for="novo-descricao">Descrição</label>
+            <ion-textarea id="novo-descricao" [(ngModel)]="novoAnuncio.descricao" placeholder="Detalhes sobre a peça..." rows="4" auto-grow="true"></ion-textarea>
+          </div>
+          <div class="modal-campo">
+            <label class="modal-label" for="novo-preco">Preço (R$) *</label>
+            <ion-input id="novo-preco" type="number" [(ngModel)]="novoAnuncio.preco" placeholder="0,00"></ion-input>
+          </div>
+          <ion-button expand="block" class="salvar-button ion-margin-top" (click)="publicarAnuncio()">
+            Publicar Anúncio
+          </ion-button>
+        </ng-container>
 
       </ion-content>
     </ng-template>

@@ -10,14 +10,74 @@ ion-toolbar {
     text-transform: uppercase;
   }
 
-  ion-back-button {
+  ion-button {
     --color: #000000;
   }
 }
 
 ion-content {
-  --background: #ffffff;
+  --background: #f9f9f9;
 }
+
+// ── Busca ────────────────────────────────────────────────────────────────────
+
+.searchbar-container {
+  background: #ffffff;
+  padding: 8px 12px 0;
+
+  ion-searchbar {
+    --background: #f3f3f3;
+    --border-radius: 0;
+    --box-shadow: none;
+    --color: #000000;
+    --placeholder-color: #9ca3af;
+    --icon-color: #9ca3af;
+    --clear-button-color: #9ca3af;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+}
+
+// ── Filtros ──────────────────────────────────────────────────────────────────
+
+.filtros-container {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 12px;
+  overflow-x: auto;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+
+  &::-webkit-scrollbar { display: none; }
+
+  ion-chip {
+    --background: #f3f3f3;
+    --color: #6b7280;
+    border-radius: 0;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    height: 28px;
+    flex-shrink: 0;
+    margin: 0;
+
+    &.ativo {
+      --background: #000000;
+      --color: #ffffff;
+    }
+
+    &.chip-limpar {
+      --background: transparent;
+      --color: #9ca3af;
+      border: 1px solid #e5e5e5;
+
+      ion-icon { margin-right: 4px; font-size: 14px; }
+    }
+  }
+}
+
+// ── Estados ──────────────────────────────────────────────────────────────────
 
 .loading-container {
   display: flex;
@@ -61,8 +121,10 @@ ion-content {
   }
 }
 
+// ── Lista de anúncios ────────────────────────────────────────────────────────
+
 .anuncios-lista {
-  padding: 20px 16px 40px;
+  padding: 16px 16px 40px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -80,30 +142,84 @@ ion-content {
   width: 100%;
   background: #ffffff;
   border: 1px solid #e5e5e5;
-  padding: 16px;
+  overflow: hidden;
 
-  .anuncio-peca {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: #9ca3af;
-    margin: 0 0 4px 0;
+  .foto-container {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
   }
 
-  .anuncio-titulo {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #000000;
-    margin: 0 0 8px 0;
+  .foto-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 40px;
+      color: #d1d5db;
+    }
   }
 
-  .anuncio-preco {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #000000;
-    margin: 0;
+  .anuncio-info {
+    padding: 12px 14px 14px;
+
+    .anuncio-marca {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #9ca3af;
+      margin: 0 0 2px 0;
+    }
+
+    .anuncio-titulo {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+
+    .anuncio-detalhe {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin: 0 0 10px 0;
+    }
+
+    .anuncio-preco {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #000000;
+      margin: 0;
+    }
   }
 }
+
+.badge-meu {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: #000000;
+  padding: 2px 8px;
+}
+
+// ── Swipe options ─────────────────────────────────────────────────────────────
 
 .option-editar {
   font-size: 0.7rem;
@@ -120,7 +236,67 @@ ion-content {
   text-transform: uppercase;
 }
 
-// Modal
+// ── Seleção de peça (etapa 1 do modal de criação) ───────────────────────────
+
+.selecionar-hint {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #9ca3af;
+  margin: 0 0 20px 0;
+}
+
+.lista-pecas {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -16px;
+}
+
+.peca-opcao {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 16px;
+  cursor: pointer;
+
+  &:active { background: #f5f5f5; }
+
+  .peca-opcao-marca {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #9ca3af;
+    margin: 0 0 2px 0;
+  }
+
+  .peca-opcao-modelo {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 4px 0;
+  }
+
+  .peca-opcao-detalhe {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0;
+  }
+}
+
+.peca-selecionada-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  padding: 4px 0 8px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+
 ion-modal {
   ion-toolbar {
     --background: #ffffff;

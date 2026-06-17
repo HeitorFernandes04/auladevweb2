@@ -1,6 +1,11 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
 
+    <ion-tab-button tab="anuncios">
+      <ion-icon name="megaphone-outline"></ion-icon>
+      <ion-label>Anúncios</ion-label>
+    </ion-tab-button>
+
     <ion-tab-button tab="pecas">
       <ion-icon name="shirt-outline"></ion-icon>
       <ion-label>Peças</ion-label>
@@ -10,11 +15,6 @@
       <ion-icon name="add-circle"></ion-icon>
       <span>Nova</span>
     </button>
-
-    <ion-tab-button tab="anuncios">
-      <ion-icon name="megaphone-outline"></ion-icon>
-      <ion-label>Anúncios</ion-label>
-    </ion-tab-button>
 
     <button class="tab-btn-custom tab-btn-sair" (click)="confirmarLogout()">
       <ion-icon name="log-out-outline"></ion-icon>

@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import *
+from .views import (
+    ListarAnuncio, CriarAnuncio, EditarAnuncio, ExcluirAnuncio,
+    APIListarTodosAnuncios, APIListarAnuncios, APICriarAnuncio,
+    APIEditarAnuncio, APIExcluirAnuncio,
+)
 
 urlpatterns = [
     path('listar-anuncio/', ListarAnuncio.as_view(), name='listar-anuncios'),
@@ -7,6 +11,7 @@ urlpatterns = [
     path('novo/', CriarAnuncio.as_view(), name='criar-anuncio'),
     path('excluir/<int:pk>/', ExcluirAnuncio.as_view(), name='excluir-anuncio'),
 
+    path('api/listar-todos/', APIListarTodosAnuncios.as_view(), name='api-listar-todos-anuncios'),
     path('api/listar/', APIListarAnuncios.as_view(), name='api-listar-anuncios'),
     path('api/novo/', APICriarAnuncio.as_view(), name='api-criar-anuncio'),
     path('api/editar/<int:pk>/', APIEditarAnuncio.as_view(), name='api-editar-anuncio'),
