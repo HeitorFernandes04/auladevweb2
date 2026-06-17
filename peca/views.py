@@ -22,7 +22,7 @@ class ListarPecas(LoginRequiredMixin, ListView):
     def get_queryset(self, **kwargs):
         pesquisa = self.request.GET.get('pesquisa', None)
         categoria = self.request.GET.get('categoria', None)
-        queryset = Peca.objects.all()
+        queryset = Peca.objects.filter(usuario=self.request.user)
         if pesquisa is not None:
             queryset = queryset.filter(modelo__icontains=pesquisa)
         if categoria:
@@ -35,22 +35,23 @@ class ListarPecas(LoginRequiredMixin, ListView):
         return context
 
 class CriarPeca(LoginRequiredMixin,CreateView):
-    """
-    View para criar uma nova peça.
-    """
     model = Peca
     form_class = FormularioPeca
     template_name = 'peca/novo.html'
     success_url = reverse_lazy('listar-pecas')
 
-class EditarPeca(LoginRequiredMixin,UpdateView):
-    """
-    View para editar uma peça existente.
-    """
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
+
+class EditarPeca(LoginRequiredMixin, UpdateView):
     model = Peca
     form_class = FormularioPeca
     template_name = 'peca/editar.html'
     success_url = reverse_lazy('listar-pecas')
+
+    def get_queryset(self):
+        return Peca.objects.filter(usuario=self.request.user)
 
 class FotoPeca(LoginRequiredMixin,ListView):
     """
@@ -74,10 +75,16 @@ class ExcluirPeca(LoginRequiredMixin, DeleteView):
     template_name = 'peca/excluir.html'
     success_url = reverse_lazy('listar-pecas')
 
+    def get_queryset(self):
+        return Peca.objects.filter(usuario=self.request.user)
+
 class APICriarPeca(CreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = SerializadorPeca
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
 
 class APIListarPecas(ListAPIView):
 
@@ -86,7 +93,7 @@ class APIListarPecas(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Peca.objects.all()
+        queryset = Peca.objects.filter(usuario=self.request.user)
         categoria = self.request.query_params.get('categoria', None)
         if categoria:
             queryset = queryset.filter(categoria=categoria)
@@ -109,7 +116,7 @@ class APIEditarPeca(RetrieveUpdateAPIView):
     serializer_class = SerializadorPeca
 
     def get_queryset(self):
-        return Peca.objects.all()
+        return Peca.objects.filter(usuario=self.request.user)
 
 class APIExcluirPeca(DestroyAPIView):
     authentication_classes = [TokenAuthentication]
@@ -117,4 +124,4 @@ class APIExcluirPeca(DestroyAPIView):
     serializer_class = SerializadorPeca
 
     def get_queryset(self):
-        return Peca.objects.all()
+        return Peca.objects.filter(usuario=self.request.user)

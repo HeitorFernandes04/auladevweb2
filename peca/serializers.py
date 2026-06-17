@@ -15,7 +15,7 @@ class SerializadorPeca(serializers.ModelSerializer):
     class Meta:
         model = Peca
         exclude = []
-        read_only_fields = ['nome_marca', 'nome_cor', 'nome_tamanho', 'nome_categoria']
+        read_only_fields = ['usuario', 'nome_marca', 'nome_cor', 'nome_tamanho', 'nome_categoria']
         extra_kwargs = {
             'foto': {'required': False},
         }

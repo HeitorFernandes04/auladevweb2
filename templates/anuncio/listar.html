@@ -1,29 +1,71 @@
 {% extends 'base.html' %}
 
-{% block title %}Meus Anúncios — Seleto Clouting{% endblock %}
+{% block title %}Anúncios — Seleto Clouting{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- Cabeçalho -->
     <div class="flex items-center justify-between mb-8">
-        <h1 class="text-xs uppercase tracking-widest font-semibold">Meus Anúncios</h1>
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Anúncios</h1>
         <a href="{% url 'criar-anuncio' %}"
            class="flex items-center gap-2 border border-black text-xs uppercase tracking-widest px-5 py-2.5 hover:bg-black hover:text-white transition-colors">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Novo Anúncio
         </a>
     </div>
 
-    <!-- Busca -->
+    <!-- Busca e filtros -->
     <form action="{% url 'listar-anuncios' %}" method="GET" novalidate>
-        <div class="relative mb-10 max-w-md">
-            <input type="text"
-                   name="pesquisa"
-                   placeholder="Buscar por título ou peça..."
-                   value="{{ request.GET.pesquisa|default:'' }}">
-            <button type="submit" class="absolute right-0 bottom-2 text-gray-400 hover:text-black transition-colors">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </button>
+        <div class="flex flex-col gap-4 mb-10">
+
+            <!-- Busca -->
+            <div class="relative max-w-md">
+                <input type="text"
+                       name="pesquisa"
+                       placeholder="Buscar por título ou peça..."
+                       value="{{ request.GET.pesquisa|default:'' }}">
+                <button type="submit" class="absolute right-0 bottom-2 text-gray-400 hover:text-black transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="flex flex-wrap gap-3 items-center">
+                <select name="categoria" onchange="this.form.submit()" class="w-auto text-xs">
+                    <option value="">Todas as categorias</option>
+                    {% for valor, label in opcoes_categoria %}
+                        <option value="{{ valor }}" {% if request.GET.categoria == valor|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="marca" onchange="this.form.submit()" class="w-auto text-xs">
+                    <option value="">Todas as marcas</option>
+                    {% for valor, label in opcoes_marca %}
+                        <option value="{{ valor }}" {% if request.GET.marca == valor|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="tamanho" onchange="this.form.submit()" class="w-auto text-xs">
+                    <option value="">Todos os tamanhos</option>
+                    {% for valor, label in opcoes_tamanho %}
+                        <option value="{{ valor }}" {% if request.GET.tamanho == valor|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="cor" onchange="this.form.submit()" class="w-auto text-xs">
+                    <option value="">Todas as cores</option>
+                    {% for valor, label in opcoes_cor %}
+                        <option value="{{ valor }}" {% if request.GET.cor == valor|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                {% if request.GET.pesquisa or request.GET.categoria or request.GET.marca or request.GET.tamanho or request.GET.cor %}
+                    <a href="{% url 'listar-anuncios' %}"
+                       class="text-xs uppercase tracking-widest text-gray-400 hover:text-black transition-colors underline underline-offset-2">
+                        Limpar filtros
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </form>
 
@@ -38,7 +80,7 @@
                 {% if anuncio.peca.foto %}
                     <img src="{% url 'foto-peca' arquivo=anuncio.peca.foto.name %}"
                          alt="{{ anuncio.peca.modelo }}"
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                         class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
                 {% else %}
                     <div class="w-full h-full flex items-center justify-center">
                         <i data-lucide="image" class="w-8 h-8 text-gray-300"></i>
@@ -50,21 +92,26 @@
             <p class="text-xs uppercase tracking-widest text-gray-400 mb-0.5">{{ anuncio.peca.get_marca_display }}</p>
             <p class="text-sm font-semibold mb-0.5">{{ anuncio.titulo }}</p>
             <p class="text-xs text-gray-400 mb-1">
-                {{ anuncio.peca.modelo }} · Tam. {{ anuncio.peca.get_tamanho_display }}
+                {{ anuncio.peca.get_categoria_display }} · Tam. {{ anuncio.peca.get_tamanho_display }}
             </p>
             <p class="text-sm font-semibold">R$ {{ anuncio.preco }}</p>
 
-            <!-- Ações -->
-            <div class="flex gap-5 mt-3">
-                <a href="{% url 'editar-anuncio' anuncio.pk %}"
-                   class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
-                    Editar
-                </a>
-                <a href="{% url 'excluir-anuncio' anuncio.pk %}"
-                   class="text-xs uppercase tracking-widest underline underline-offset-2 text-red-700 hover:opacity-40 transition-opacity">
-                    Excluir
-                </a>
-            </div>
+            <!-- Badge e ações (só para anúncios próprios) -->
+            {% if anuncio.usuario == request.user %}
+                <span class="inline-block mt-2 mb-1 text-xs uppercase tracking-widest font-semibold bg-black text-white px-2 py-0.5">
+                    Seu anúncio
+                </span>
+                <div class="flex gap-5 mt-2">
+                    <a href="{% url 'editar-anuncio' anuncio.pk %}"
+                       class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
+                        Editar
+                    </a>
+                    <a href="{% url 'excluir-anuncio' anuncio.pk %}"
+                       class="text-xs uppercase tracking-widest underline underline-offset-2 text-red-700 hover:opacity-40 transition-opacity">
+                        Excluir
+                    </a>
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>

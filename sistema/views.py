@@ -15,10 +15,10 @@ class Login(View):
     def get(self, request):
         context = {'mensagem': ''}
         if request.user.is_authenticated:
-            return redirect("listar-pecas")
+            return redirect("listar-anuncios")
         else:
             return render(request, 'autenticacao.html', context)
-    
+
     def post(self, request):
         usuario = request.POST.get('usuario', None)
         senha = request.POST.get('senha', None)
@@ -28,7 +28,7 @@ class Login(View):
             #verificar se esta ativo
             if user.is_active:
                 login(request, user)
-                return redirect("listar-pecas")
+                return redirect("listar-anuncios")
             else:
                 return render(request, 'autenticacao.html', {"mensagem": "Usuario inativo"})
         return render (request, 'autenticacao.html', {"mensagem": "Usuario ou senha invalidos"})

@@ -6,4 +6,4 @@ class FormularioPeca(ModelForm):
 
     class Meta:
         model = Peca
-        exclude = []
+        fields = ['marca', 'modelo', 'ano', 'cor', 'tamanho', 'categoria', 'foto']

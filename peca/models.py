@@ -1,7 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 from peca.consts import *
 from datetime import date, datetime
+
 class Peca(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     marca = models.SmallIntegerField(choices=OPCOES_MARCA)
     modelo = models.CharField(max_length=100)
     ano = models.IntegerField()

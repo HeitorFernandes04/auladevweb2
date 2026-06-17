@@ -7,7 +7,7 @@
 
     <!-- Cabeçalho -->
     <div class="flex items-center justify-between mb-8">
-        <h1 class="text-xs uppercase tracking-widest font-semibold">Peças</h1>
+        <h1 class="text-xs uppercase tracking-widest font-semibold">Guarda-Roupa</h1>
         <a href="{% url 'criar-peca' %}"
            class="flex items-center gap-2 border border-black text-xs uppercase tracking-widest px-5 py-2.5 hover:bg-black hover:text-white transition-colors">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nova Peça
@@ -70,6 +70,10 @@
                 <a href="{% url 'editar-peca' peca.pk %}"
                    class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
                     Editar
+                </a>
+                <a href="{% url 'criar-anuncio' %}?peca={{ peca.pk }}"
+                   class="text-xs uppercase tracking-widest underline underline-offset-2 hover:opacity-40 transition-opacity">
+                    Anunciar
                 </a>
                 <a href="{% url 'excluir-peca' peca.pk %}"
                    class="text-xs uppercase tracking-widest underline underline-offset-2 text-red-700 hover:opacity-40 transition-opacity">
